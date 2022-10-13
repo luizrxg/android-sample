@@ -24,7 +24,8 @@ import com.wishes.R
 @Composable
 fun TopBar(
     title: String? = "",
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    action: @Composable (() -> Unit)? = null
 ){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -59,6 +60,11 @@ fun TopBar(
                     .align(Alignment.CenterStart)
                     .padding(start = 48.dp)
             )
+            action?.let {
+                Box(modifier = Modifier.align(Alignment.CenterEnd)){
+                    it()
+                }
+            }
         }
     }
 }

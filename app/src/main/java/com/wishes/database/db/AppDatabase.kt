@@ -14,7 +14,7 @@ import com.wishes.database.dao.*
     entities = [
         WishEntity::class,
         LinkEntity::class,
-
+        SaldoEntity::class,
     ],
     version = 1, exportSchema = false
 )
@@ -22,6 +22,7 @@ import com.wishes.database.dao.*
 abstract class AppDatabase : RoomDatabase() {
     abstract fun wishDao(): WishDao
     abstract fun linkDao(): LinkDao
+    abstract fun saldoDao(): SaldoDao
 
     companion object {
 

@@ -1,20 +1,16 @@
 package com.wishes.ui.commons.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ExpandLess
-import androidx.compose.material.icons.rounded.ExpandMore
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import java.math.BigDecimal
 
@@ -32,7 +28,15 @@ fun NumberField(
 ){
     OutlinedTextField(
         value = value.toString(),
-        onValueChange = { if (it.length < 20) onValueChange(it.toBigDecimal()) },
+        onValueChange = {
+            if (it.length < 20)
+                onValueChange(
+                    if (it.isNotEmpty())
+                        it.toBigDecimal()
+                    else
+                        0.toBigDecimal()
+                )
+            },
         placeholder = {
             if (placeholder != null)
             Text(

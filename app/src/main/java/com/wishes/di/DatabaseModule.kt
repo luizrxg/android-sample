@@ -2,6 +2,7 @@ package com.wishes.di
 
 import android.content.Context
 import com.wishes.database.dao.LinkDao
+import com.wishes.database.dao.SaldoDao
 import com.wishes.database.dao.WishDao
 import com.wishes.database.db.AppDatabase
 import com.wishes.database.db.DatabaseTransactionRunner
@@ -32,6 +33,11 @@ class DatabaseModule {
     @Provides
     fun provideLinkDao(appDatabase: AppDatabase): LinkDao {
         return appDatabase.linkDao()
+    }
+
+    @Provides
+    fun provideSaldoDao(appDatabase: AppDatabase): SaldoDao {
+        return appDatabase.saldoDao()
     }
 }
 

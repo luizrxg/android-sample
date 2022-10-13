@@ -1,6 +1,7 @@
 package com.wishes.util
 
 import java.time.LocalDateTime
+import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.*
 
@@ -27,4 +28,11 @@ enum class Week (
 ) {
     WEEK_START(LocalDateTime.now().minusDays(LocalDateTime.now().dayOfWeek.value.toLong())),
     WEEK_END(LocalDateTime.now().plusDays(6 - LocalDateTime.now().dayOfWeek.value.toLong()));
+}
+
+enum class Month (
+    val monthDay: LocalDateTime,
+) {
+    MONTH_START(LocalDateTime.now().minusDays(LocalDateTime.now().dayOfMonth.toLong())),
+    MONTH_END(LocalDateTime.now());
 }

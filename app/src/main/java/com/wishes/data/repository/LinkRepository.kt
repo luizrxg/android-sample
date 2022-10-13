@@ -18,7 +18,15 @@ class LinkRepository @Inject constructor(
         return linkDao.buscarLinks()
     }
 
-    fun criarLink(link: LinkEntity) {
+    fun buscarLinksPorId(id: Long): PagingSource<Int, LinkEntity> {
+        return linkDao.buscarLinksPorId(id)
+    }
+
+    suspend fun criarLink(link: LinkEntity) {
         return linkDao.criarLink(link)
+    }
+
+    suspend fun deleteLink(link: LinkEntity) {
+        return linkDao.deleteLink(link)
     }
 }

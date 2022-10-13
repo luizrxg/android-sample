@@ -1,13 +1,10 @@
 package com.wishes.ui.home
 
-import android.net.Uri
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
-import com.wishes.ui.navigation.WishesNavigationDestination
 import com.google.accompanist.navigation.animation.composable
+import com.wishes.ui.navigation.WishesNavigationDestination
 
 object HomeDestination : WishesNavigationDestination {
     override val route = "home_route"
@@ -21,6 +18,7 @@ fun NavGraphBuilder.home(
     currentDestination: NavDestination?,
     onBackClick: () -> Unit,
     openDrawer: () -> Unit,
+    onNavigateToOverview: (Long) -> Unit,
 ) {
     composable(
         route = HomeDestination.route,
@@ -30,6 +28,7 @@ fun NavGraphBuilder.home(
             currentDestination,
             onBackClick,
             openDrawer,
+            onNavigateToOverview
         )
     }
 }

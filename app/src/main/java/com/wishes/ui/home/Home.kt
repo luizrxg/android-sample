@@ -1,19 +1,16 @@
 package com.wishes.ui.home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -21,16 +18,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.wishes.R
 import com.wishes.data.model.Wish
+import com.wishes.database.entity.SaldoEntity
 import com.wishes.ui.commons.components.Button
+import com.wishes.ui.commons.components.InputDialog
 import com.wishes.ui.commons.components.Wish
 import com.wishes.ui.create.CreateDestination
 import com.wishes.ui.navigation.WishesNavigationDestination
+import com.wishes.ui.receipt.ReceiptDestination
+import com.wishes.ui.receipt.ReceiptViewModel
+import java.math.BigDecimal
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -39,15 +42,22 @@ fun HomeRoute(
     currentDestination: NavDestination?,
     onBackClick: () -> Unit,
     openDrawer: () -> Unit,
+    onNavigateToOverview: (Long) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val wishes = viewModel.pagingWishes.collectAsLazyPagingItems()
+    val saldo = viewModel.stateSaldo.collectAsStateWithLifecycle()
 
     HomeScreen(
         onNavigateToDestination,
         onBackClick,
         openDrawer,
-        wishes
+        onNavigateToOverview,
+        wishes,
+        saldo.value,
+        viewModel::adicionarSaldo,
+        viewModel::subtrairSaldo,
+        viewModel::criarSaldo
     )
 }
 
@@ -58,8 +68,17 @@ fun HomeScreen(
     onNavigateToDestination: (WishesNavigationDestination, String) -> Unit,
     onBackClick: () -> Unit,
     openDrawer: () -> Unit,
-    wishes: LazyPagingItems<Wish>
+    onNavigateToOverview: (Long) -> Unit,
+    wishes: LazyPagingItems<Wish>,
+    saldo: BigDecimal? = 0.toBigDecimal(),
+    adicionarSaldo: (saldo: BigDecimal) -> Unit,
+    subtrairSaldo: (saldo: BigDecimal) -> Unit,
+    criarSaldo: (saldo: SaldoEntity) -> Unit
 ) {
+    var expanded by remember { mutableStateOf(false) }
+    var adicionarExpanded by remember { mutableStateOf(false) }
+    var subtrairExpanded by remember { mutableStateOf(false) }
+    var novoSaldo by remember { mutableStateOf(saldo ?: 0.toBigDecimal()) }
 
     Scaffold(
         contentColor = MaterialTheme.colors.secondary,
@@ -92,14 +111,14 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colors.primary, RoundedCornerShape(0, 0, 10, 10))
+                    .background(MaterialTheme.colors.primary)
             ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp, 14.dp, 8.dp, 0.dp)
+                        .padding(20.dp, 12.dp, 8.dp, 0.dp)
                 ){
                     Icon(
                         painter = painterResource(R.drawable.ic_logo),
@@ -107,16 +126,85 @@ fun HomeScreen(
                         tint = MaterialTheme.colors.secondary,
                         modifier = Modifier.requiredHeight(38.dp)
                     )
-                    IconButton(
-                        onClick = { }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.MoreVert,
-                            contentDescription = null,
-                            tint = MaterialTheme.colors.secondary,
-                        )
+                    Box {
+                        IconButton(
+                            onClick = { expanded = !expanded }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.MoreVert,
+                                contentDescription = null,
+                                tint = MaterialTheme.colors.secondary,
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                            modifier = Modifier
+                                .background(MaterialTheme.colors.secondary)
+                                .clip(MaterialTheme.shapes.small)
+                                .align(Alignment.CenterStart)
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Adicionar saldo") },
+                                onClick = { adicionarExpanded = !adicionarExpanded },
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_more_cash),
+                                        contentDescription = null,
+                                        modifier = Modifier.requiredSize(32.dp)
+                                    )
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Subtrair saldo") },
+                                onClick = { subtrairExpanded = !subtrairExpanded },
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_minus_cash),
+                                        contentDescription = null,
+                                        modifier = Modifier.requiredSize(32.dp)
+                                    )
+                                }
+                            )
+                        }
+
                     }
                 }
+                if (adicionarExpanded)
+                InputDialog(
+                    title = "Adicionar saldo",
+                    value = novoSaldo.toString(),
+                    onValueChange = { novoSaldo = if (it.isNotEmpty()) it.toBigDecimal() else 0.toBigDecimal() },
+                    cancelText = "Voltar",
+                    confirmText = "Confirmar",
+                    confirmAction = {
+                        if (saldo != null) {
+                            adicionarSaldo(novoSaldo)
+                        } else {
+                            criarSaldo(SaldoEntity(0, novoSaldo))
+                        }
+                        novoSaldo = 0.toBigDecimal()
+                    },
+                    onDismiss = { adicionarExpanded = false }
+                )
+                if (subtrairExpanded)
+                InputDialog(
+                    title = "Subtrair saldo",
+                    value = novoSaldo.toString(),
+                    onValueChange = { novoSaldo = if (it.isNotEmpty()) it.toBigDecimal() else 0.toBigDecimal() },
+                    cancelText = "Voltar",
+                    confirmText = "Confirmar",
+                    confirmAction = {
+                        if (saldo != null) {
+                            subtrairSaldo(novoSaldo)
+                        } else {
+                            criarSaldo(SaldoEntity(0, novoSaldo))
+                        }
+                        novoSaldo = 0.toBigDecimal()
+                    },
+                    onDismiss = { subtrairExpanded = false }
+                )
+
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -139,7 +227,7 @@ fun HomeScreen(
                             fontSize = 16.sp,
                         )
                         Text(
-                            "R$ 2468,82",
+                            "R$ ${saldo ?: 0}",
                             color = MaterialTheme.colors.secondary,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 20.sp,
@@ -147,23 +235,32 @@ fun HomeScreen(
                     }
                     Button(
                         text = "Ver extrato",
-                        onClick = {},
+                        onClick = { onNavigateToDestination(ReceiptDestination, ReceiptDestination.route) },
                         variant = "translucent"
                     )
                 }
             }
             LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(16.dp),
                 modifier = Modifier
                     .background(MaterialTheme.colors.background)
                     .fillMaxSize()
             ) {
+                item {
+                    Spacer(modifier = Modifier.requiredHeight(16.dp))
+                }
                 items(wishes) { obj ->
                     obj?.let {
-                        Wish(obj)
+                        if (!obj.comprado){
+                            Wish(
+                                obj,
+                                { onNavigateToOverview(obj.id) }
+                            )
+                        }
                     }
+                }
+                item {
+                    Spacer(modifier = Modifier.requiredHeight(64.dp))
                 }
             }
         }

@@ -24,7 +24,7 @@ class CreateViewModel  @Inject internal constructor(
 
     private val id = wishRepository.buscarUltimoId()
 
-    val stateId: StateFlow<Long> = id.stateIn(
+    val stateId: StateFlow<Long?> = id.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = 0

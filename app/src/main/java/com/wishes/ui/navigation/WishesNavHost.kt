@@ -8,10 +8,13 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph
 import androidx.navigation.NavHostController
-import com.wishes.ui.home.HomeDestination
-import com.wishes.ui.home.home
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.wishes.ui.create.create
+import com.wishes.ui.home.HomeDestination
+import com.wishes.ui.home.home
+import com.wishes.ui.overview.OverviewDestination
+import com.wishes.ui.overview.overview
+import com.wishes.ui.receipt.receipt
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -38,12 +41,34 @@ fun WishesNavHost(
             currentDestination,
             onBackClick,
             openDrawer,
+            { id ->
+                onNavigateToDestination(
+                    OverviewDestination, OverviewDestination.createNavigationRoute(id)
+                )
+            },
         )
         create(
             onNavigateToDestination,
             currentDestination,
             onBackClick,
             openDrawer,
+        )
+        overview(
+            onNavigateToDestination,
+            currentDestination,
+            onBackClick,
+            openDrawer,
+        )
+        receipt(
+            onNavigateToDestination,
+            currentDestination,
+            onBackClick,
+            openDrawer,
+            { id ->
+                onNavigateToDestination(
+                    OverviewDestination, OverviewDestination.createNavigationRoute(id)
+                )
+            },
         )
     }
 }
