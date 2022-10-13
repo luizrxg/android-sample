@@ -8,6 +8,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.res.colorResource
+import com.wishes.R
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -17,8 +19,8 @@ fun SwipeDismissSnackbar(
     snackbar: @Composable (SnackbarData) -> Unit = {
         Snackbar(
             snackbarData = it,
-            contentColor = MaterialTheme.colors.primary,
-            containerColor = MaterialTheme.colors.secondary
+            contentColor = MaterialTheme.colors.secondary,
+            containerColor = colorResource(R.color.red)
         )
     },
 ) {

@@ -3,6 +3,7 @@ package com.wishes.ui.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
@@ -90,11 +91,13 @@ fun HomeScreen(
                 },
                 containerColor = MaterialTheme.colors.primary,
                 contentColor = MaterialTheme.colors.secondary,
+                shape = RoundedCornerShape(100)
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Add,
                     contentDescription = null,
                     tint = MaterialTheme.colors.secondary,
+
                 )
             }
         },

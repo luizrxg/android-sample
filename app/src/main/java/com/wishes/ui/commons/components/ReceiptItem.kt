@@ -47,7 +47,17 @@ fun ReceiptItem(
         Row(
             modifier = Modifier
                 .fillMaxHeight()
-                .padding(start = 34.dp)
+                .padding(
+                    if (isFirst && isLast) {
+                        PaddingValues(0.dp)
+                    } else if (isFirst) {
+                        PaddingValues(34.dp, 41.dp, 0.dp, 0.dp)
+                    } else if (isLast) {
+                        PaddingValues(34.dp, 0.dp, 0.dp, 41.dp)
+                    } else {
+                        PaddingValues(34.dp, 0.dp, 0.dp, 0.dp)
+                    }
+                )
                 .requiredHeight(
                     if (isFirst || isLast)
                         41.dp
@@ -58,14 +68,7 @@ fun ReceiptItem(
                 )
                 .requiredWidth(1.dp)
                 .background(MaterialTheme.colors.secondaryVariant,)
-                .align(
-                    if (isFirst)
-                        Alignment.BottomStart
-                    else if (isLast)
-                        Alignment.TopStart
-                    else
-                        Alignment.CenterStart
-                )
+                .align(Alignment.CenterStart)
         ){}
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -86,7 +89,10 @@ fun ReceiptItem(
                     hora,
                     style = MaterialTheme.typography.body2,
                     color = MaterialTheme.colors.secondaryVariant,
-                    modifier = Modifier.padding(end = 16.dp)
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .requiredWidth(40.dp)
                 )
                 Text(
                     wish.nome,
@@ -119,6 +125,7 @@ fun ReceiptItem(
                     textAlign = TextAlign.Start,
                     style = MaterialTheme.typography.body1,
                     overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     modifier = Modifier.widthIn(max = 150.dp)
                 )

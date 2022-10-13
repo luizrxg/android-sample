@@ -53,19 +53,22 @@ fun OverviewRoute(
     viewModel: OverviewViewModel = hiltViewModel(),
 ) {
 
-    val wish = viewModel.stateWish.collectAsStateWithLifecycle()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val links = viewModel.pagingLinks.collectAsLazyPagingItems()
+    val comprarState = viewModel.stateComprar.collectAsStateWithLifecycle()
 
     OverviewScreen(
         onNavigateToDestination,
         onBackClick,
         openDrawer,
-        wish.value,
+        uiState.value.wish,
         links,
         { viewModel.comprarWish() },
         { viewModel.deleteWish() },
         viewModel::criarLink,
         viewModel::deleteLink,
+        viewModel::clearMessage,
+        comprarState.value
     )
 }
 
@@ -82,12 +85,26 @@ fun OverviewScreen(
     delete: () -> Unit,
     criarLink: (link: LinkEntity) -> Unit,
     deleteLink: (link: LinkEntity) -> Unit,
+    deleteMessage: () -> Unit,
+    comprarState: ComprarUiState,
 ) {
     val context = LocalContext.current
     var comprarExpanded by remember { mutableStateOf(false) }
     var menuExpanded by remember { mutableStateOf(false) }
     var deleteExpanded by remember { mutableStateOf(false) }
     var link by remember { mutableStateOf("") }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    comprarState.message?.let { message ->
+        LaunchedEffect(message) {
+            snackbarHostState.showSnackbar(message.message)
+            deleteMessage()
+        }
+    }
+
+    comprarState.temSaldo?.let { saldo ->
+        if(saldo) onBackClick()
+    }
 
     fun addLink(){
         if (link.isNotEmpty()){
@@ -136,6 +153,13 @@ fun OverviewScreen(
                 }
             }
         },
+        snackbarHost = {
+            SwipeDismissSnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+        }
     ) {
         wish?.let {
             Box{
@@ -163,30 +187,16 @@ fun OverviewScreen(
                                 .padding(16.dp)
                                 .fillMaxWidth()
                         ) {
-                            Column(
-                                horizontalAlignment = Alignment.Start,
-                                verticalArrangement = Arrangement.SpaceBetween,
-                            ){
-//                                Text(
-//                                    wish.nome,
-//                                    textAlign = TextAlign.Start,
-//                                    style = MaterialTheme.typography.body1,
-//                                    fontWeight = FontWeight.Bold,
-//                                    overflow = TextOverflow.Ellipsis,
-//                                    maxLines = 1,
-//                                    modifier = Modifier.widthIn(max = 150.dp)
-//                                )
-                                Text(
-                                    "R$ ${wish.preco}",
-                                    color = MaterialTheme.colors.primary,
-                                    textAlign = TextAlign.Start,
-                                    style = MaterialTheme.typography.h6,
-                                    fontWeight = FontWeight.Bold,
-                                    overflow = TextOverflow.Ellipsis,
-                                    maxLines = 1,
-                                    modifier = Modifier.widthIn(max = 150.dp)
-                                )
-                            }
+                            Text(
+                                "R$ ${wish.preco}",
+                                color = MaterialTheme.colors.primary,
+                                textAlign = TextAlign.Start,
+                                style = MaterialTheme.typography.h6,
+                                fontWeight = FontWeight.Bold,
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                                modifier = Modifier.widthIn(max = 150.dp)
+                            )
                             Icon(
                                 painter = painterResource(
                                     when (wish.prioridade){
@@ -244,7 +254,7 @@ fun OverviewScreen(
                             2.dp,
                             colorResource(R.color.dark),
                         )
-                        if (links.itemCount > 0)
+                        if (wish.prioridade < 3)
                             Text(
                                 "Links",
                                 textAlign = TextAlign.Start,
@@ -259,10 +269,7 @@ fun OverviewScreen(
                                 title = "Deseja marcar como comprado ?",
                                 cancelText = "Voltar",
                                 confirmText = "Confirmar",
-                                confirmAction = {
-                                    comprar()
-                                    onBackClick()
-                                },
+                                confirmAction = { comprar() },
                                 onDismiss = { comprarExpanded = false }
                             )
 
@@ -277,6 +284,7 @@ fun OverviewScreen(
                                 },
                                 onDismiss = { deleteExpanded = false }
                             )
+                        if (wish.prioridade < 3)
                         TextField(
                             link,
                             { link = it },
@@ -358,21 +366,22 @@ fun OverviewScreen(
                         }
                     }
                 }
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .background(MaterialTheme.colors.background)
-                ){
-                    Button(
-                        text = "COMPRAR",
-                        onClick = { comprarExpanded = true },
-                        variant = "filled",
+                if (!wish.comprado)
+                    Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp, 16.dp)
-                            .requiredHeight(48.dp)
-                    )
-                }
+                            .align(Alignment.BottomCenter)
+                            .background(MaterialTheme.colors.background)
+                    ){
+                        Button(
+                            text = "COMPRAR" ,
+                            onClick = { comprarExpanded = true },
+                            variant = "filled",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp, 16.dp)
+                                .requiredHeight(48.dp)
+                        )
+                    }
             }
         }
     }
