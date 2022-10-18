@@ -41,15 +41,7 @@ fun InputDialog(
                 title,
                 style = MaterialTheme.typography.h6,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-            Divider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .clip(RoundedCornerShape(100)),
-                .5.dp,
-                MaterialTheme.colors.secondaryVariant,
+                modifier = Modifier.padding(top = 16.dp, bottom = 14.dp)
             )
             TextField(
                 value = value,

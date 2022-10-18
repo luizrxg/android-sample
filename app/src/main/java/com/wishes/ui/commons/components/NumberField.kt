@@ -34,7 +34,7 @@ fun NumberField(
                     if (it.isNotEmpty())
                         it.toBigDecimal()
                     else
-                        0.toBigDecimal()
+                        BigDecimal.ZERO
                 )
             },
         placeholder = {

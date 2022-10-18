@@ -71,7 +71,7 @@ fun Button(
                 if (enabled!!){
                     ButtonDefaults.buttonColors(
                         containerColor = Color.Transparent,
-                        contentColor = color,
+                        contentColor = MaterialTheme.colors.secondary,
                     )
                 } else {
                     ButtonDefaults.buttonColors(

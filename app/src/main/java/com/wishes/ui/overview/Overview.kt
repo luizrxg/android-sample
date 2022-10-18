@@ -102,8 +102,8 @@ fun OverviewScreen(
         }
     }
 
-    comprarState.temSaldo?.let { saldo ->
-        if(saldo) onBackClick()
+    comprarState.temSaldo?.let { temSaldo ->
+        if(temSaldo) onBackClick()
     }
 
     fun addLink(){
@@ -305,6 +305,8 @@ fun OverviewScreen(
                         )
                     }
                     items(links){ link ->
+
+                        if (wish.prioridade < 3)
                         link?.let {
                             val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(link.link)) }
 

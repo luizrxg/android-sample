@@ -29,6 +29,7 @@ import com.wishes.data.model.Wish
 import com.wishes.database.entity.SaldoEntity
 import com.wishes.ui.commons.components.Button
 import com.wishes.ui.commons.components.InputDialog
+import com.wishes.ui.commons.components.SwipeDismissSnackbarHost
 import com.wishes.ui.commons.components.Wish
 import com.wishes.ui.create.CreateDestination
 import com.wishes.ui.navigation.WishesNavigationDestination
@@ -48,6 +49,7 @@ fun HomeRoute(
 ) {
     val wishes = viewModel.pagingWishes.collectAsLazyPagingItems()
     val saldo = viewModel.stateSaldo.collectAsStateWithLifecycle()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(
         onNavigateToDestination,
@@ -58,7 +60,9 @@ fun HomeRoute(
         saldo.value,
         viewModel::adicionarSaldo,
         viewModel::subtrairSaldo,
-        viewModel::criarSaldo
+        viewModel::criarSaldo,
+        viewModel::clearMessage,
+        uiState.value
     )
 }
 
@@ -71,24 +75,36 @@ fun HomeScreen(
     openDrawer: () -> Unit,
     onNavigateToOverview: (Long) -> Unit,
     wishes: LazyPagingItems<Wish>,
-    saldo: BigDecimal? = 0.toBigDecimal(),
+    saldo: BigDecimal? = BigDecimal.ZERO,
     adicionarSaldo: (saldo: BigDecimal) -> Unit,
     subtrairSaldo: (saldo: BigDecimal) -> Unit,
-    criarSaldo: (saldo: SaldoEntity) -> Unit
+    criarSaldo: (saldo: SaldoEntity) -> Unit,
+    deleteMessage: () -> Unit,
+    uiState: UiState
 ) {
     var expanded by remember { mutableStateOf(false) }
     var adicionarExpanded by remember { mutableStateOf(false) }
     var subtrairExpanded by remember { mutableStateOf(false) }
-    var novoSaldo by remember { mutableStateOf(saldo ?: 0.toBigDecimal()) }
+    var novoSaldo by remember { mutableStateOf(BigDecimal.ZERO) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    uiState.message?.let { message ->
+        LaunchedEffect(message) {
+            snackbarHostState.showSnackbar(message.message)
+            deleteMessage()
+        }
+    }
+
+    uiState.temSaldo?.let { temSaldo ->
+        if(temSaldo) subtrairExpanded = false
+    }
 
     Scaffold(
         contentColor = MaterialTheme.colors.secondary,
         containerColor = MaterialTheme.colors.primary,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    onNavigateToDestination(CreateDestination, CreateDestination.route)
-                },
+                onClick = { onNavigateToDestination(CreateDestination, CreateDestination.route) },
                 containerColor = MaterialTheme.colors.primary,
                 contentColor = MaterialTheme.colors.secondary,
                 shape = RoundedCornerShape(100)
@@ -101,6 +117,13 @@ fun HomeScreen(
                 )
             }
         },
+        snackbarHost = {
+            SwipeDismissSnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+        }
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -158,6 +181,7 @@ fun HomeScreen(
                                     )
                                 }
                             )
+                            if (saldo != null)
                             DropdownMenuItem(
                                 text = { Text("Subtrair saldo") },
                                 onClick = { subtrairExpanded = !subtrairExpanded },
@@ -177,7 +201,7 @@ fun HomeScreen(
                 InputDialog(
                     title = "Adicionar saldo",
                     value = novoSaldo.toString(),
-                    onValueChange = { novoSaldo = if (it.isNotEmpty()) it.toBigDecimal() else 0.toBigDecimal() },
+                    onValueChange = { novoSaldo = if (it.isNotEmpty()) it.toBigDecimal() else BigDecimal.ZERO },
                     cancelText = "Voltar",
                     confirmText = "Confirmar",
                     confirmAction = {
@@ -186,7 +210,7 @@ fun HomeScreen(
                         } else {
                             criarSaldo(SaldoEntity(0, novoSaldo))
                         }
-                        novoSaldo = 0.toBigDecimal()
+                        novoSaldo = BigDecimal.ZERO
                     },
                     onDismiss = { adicionarExpanded = false }
                 )
@@ -194,16 +218,12 @@ fun HomeScreen(
                 InputDialog(
                     title = "Subtrair saldo",
                     value = novoSaldo.toString(),
-                    onValueChange = { novoSaldo = if (it.isNotEmpty()) it.toBigDecimal() else 0.toBigDecimal() },
+                    onValueChange = { novoSaldo = if (it.isNotEmpty()) it.toBigDecimal() else BigDecimal.ZERO },
                     cancelText = "Voltar",
                     confirmText = "Confirmar",
                     confirmAction = {
-                        if (saldo != null) {
-                            subtrairSaldo(novoSaldo)
-                        } else {
-                            criarSaldo(SaldoEntity(0, novoSaldo))
-                        }
-                        novoSaldo = 0.toBigDecimal()
+                        subtrairSaldo(novoSaldo)
+                        novoSaldo = BigDecimal.ZERO
                     },
                     onDismiss = { subtrairExpanded = false }
                 )

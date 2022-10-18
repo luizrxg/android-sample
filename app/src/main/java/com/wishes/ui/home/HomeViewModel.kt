@@ -7,15 +7,16 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.wishes.data.domain.BuscarWishes
+import com.wishes.data.model.Wish
 import com.wishes.data.repository.SaldoRepository
 import com.wishes.data.repository.WishRepository
 import com.wishes.database.entity.SaldoEntity
 import com.wishes.database.entity.WishEntity
+import com.wishes.ui.commons.UiMessage
+import com.wishes.ui.commons.UiMessageManager
+import com.wishes.ui.overview.ComprarUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -33,7 +34,7 @@ class HomeViewModel  @Inject internal constructor(
     val stateSaldo: StateFlow<BigDecimal?> = saldo.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = 0.toBigDecimal()
+        initialValue = BigDecimal.ZERO
     )
 
     fun criarSaldo(saldo: SaldoEntity){
@@ -58,19 +59,45 @@ class HomeViewModel  @Inject internal constructor(
         }
     }
 
+    private val temSaldo = MutableStateFlow(false)
+    private val uiMessage = UiMessageManager()
+
     fun subtrairSaldo(saldo: BigDecimal){
+        val value = stateSaldo.value!! - saldo
+
         viewModelScope.launch {
-            saldoRepository.atualizarSaldo(stateSaldo.value!! - saldo)
-            wishRepository.criarWish(
-                WishEntity(
-                    id = 0,
-                    nome = "Saldo subtraído",
-                    preco = saldo,
-                    prioridade = 4,
-                    comprado = true,
-                    data = "${LocalDateTime.now()}"
+            if (value < BigDecimal.ZERO){
+                temSaldo.value = false
+                uiMessage.emitMessage(UiMessage("Saldo insuficiente !"))
+            } else {
+                temSaldo.value = true
+                saldoRepository.atualizarSaldo(stateSaldo.value!! - saldo)
+                wishRepository.criarWish(
+                    WishEntity(
+                        id = 0,
+                        nome = "Saldo subtraído",
+                        preco = saldo,
+                        prioridade = 4,
+                        comprado = true,
+                        data = "${LocalDateTime.now()}"
+                    )
                 )
-            )
+            }
+        }
+    }
+
+    val uiState: StateFlow<UiState> =
+        combine(temSaldo, uiMessage.message){ temSaldo, message ->
+            UiState(temSaldo, message)
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = UiState.Empty
+        )
+
+    fun clearMessage() {
+        viewModelScope.launch {
+            uiMessage.clearAll()
         }
     }
 
@@ -82,5 +109,14 @@ class HomeViewModel  @Inject internal constructor(
         viewModelScope.launch {
             buscarWishes(BuscarWishes.Params(pagConfig))
         }
+    }
+}
+
+data class UiState(
+    val temSaldo: Boolean? = false,
+    val message: UiMessage? = null
+){
+    companion object{
+        val Empty = UiState()
     }
 }

@@ -58,7 +58,6 @@ class OverviewViewModel  @Inject internal constructor(
                 wishRepository.comprarWish(id)
                 saldoRepository.atualizarSaldo(uiState.value.saldo!! - uiState.value.wish?.preco!!)
             } else {
-                println("${uiState.value.saldo!!}----------${uiState.value.wish?.preco}")
                 temSaldo.value = false
                 uiMessage.emitMessage(UiMessage("Saldo insuficiente !"))
             }
@@ -66,8 +65,8 @@ class OverviewViewModel  @Inject internal constructor(
     }
 
     val stateComprar: StateFlow<ComprarUiState> =
-        combine(temSaldo, uiMessage.message){ saldo, message ->
-            ComprarUiState(saldo, message)
+        combine(temSaldo, uiMessage.message){ temSaldo, message ->
+            ComprarUiState(temSaldo, message)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),

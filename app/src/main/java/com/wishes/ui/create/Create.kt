@@ -34,6 +34,7 @@ import com.wishes.database.entity.WishEntity
 import com.wishes.ui.commons.components.*
 import com.wishes.ui.navigation.WishesNavigationDestination
 import com.wishes.ui.overview.OverviewViewModel
+import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
@@ -69,7 +70,7 @@ fun CreateScreen(
     id: Long? = 0
 ) {
     var nome by remember { mutableStateOf("") }
-    var preco by remember { mutableStateOf(0.toBigDecimal()) }
+    var preco by remember { mutableStateOf(BigDecimal.ZERO) }
     var prioridade by remember { mutableStateOf(0) }
     var link by remember { mutableStateOf("") }
     val links = remember { mutableStateListOf<String?>() }
