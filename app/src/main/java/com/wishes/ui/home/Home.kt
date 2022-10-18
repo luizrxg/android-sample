@@ -85,7 +85,7 @@ fun HomeScreen(
     var expanded by remember { mutableStateOf(false) }
     var adicionarExpanded by remember { mutableStateOf(false) }
     var subtrairExpanded by remember { mutableStateOf(false) }
-    var novoSaldo by remember { mutableStateOf(BigDecimal.ZERO) }
+    var novoSaldo by remember { mutableStateOf("0.0") }
     val snackbarHostState = remember { SnackbarHostState() }
 
     uiState.message?.let { message ->
@@ -200,30 +200,30 @@ fun HomeScreen(
                 if (adicionarExpanded)
                 InputDialog(
                     title = "Adicionar saldo",
-                    value = novoSaldo.toString(),
-                    onValueChange = { novoSaldo = if (it.isNotEmpty()) it.toBigDecimal() else BigDecimal.ZERO },
+                    value = novoSaldo,
+                    onValueChange = { novoSaldo = it.ifEmpty { "0" } },
                     cancelText = "Voltar",
                     confirmText = "Confirmar",
                     confirmAction = {
                         if (saldo != null) {
-                            adicionarSaldo(novoSaldo)
+                            adicionarSaldo(novoSaldo.toBigDecimal())
                         } else {
-                            criarSaldo(SaldoEntity(0, novoSaldo))
+                            criarSaldo(SaldoEntity(0, novoSaldo.toBigDecimal()))
                         }
-                        novoSaldo = BigDecimal.ZERO
+                        novoSaldo = "0"
                     },
                     onDismiss = { adicionarExpanded = false }
                 )
                 if (subtrairExpanded)
                 InputDialog(
                     title = "Subtrair saldo",
-                    value = novoSaldo.toString(),
-                    onValueChange = { novoSaldo = if (it.isNotEmpty()) it.toBigDecimal() else BigDecimal.ZERO },
+                    value = novoSaldo,
+                    onValueChange = { novoSaldo = it.ifEmpty { "0" } },
                     cancelText = "Voltar",
                     confirmText = "Confirmar",
                     confirmAction = {
-                        subtrairSaldo(novoSaldo)
-                        novoSaldo = BigDecimal.ZERO
+                        subtrairSaldo(novoSaldo.toBigDecimal())
+                        novoSaldo = "0"
                     },
                     onDismiss = { subtrairExpanded = false }
                 )

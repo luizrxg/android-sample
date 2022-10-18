@@ -51,7 +51,11 @@ class WishRepository @Inject constructor(
         wishDao.comprarWish(id)
     }
 
-    suspend fun deleteWish(wish: WishEntity){
-        wishDao.deleteWish(wish)
+    suspend fun delete(wish: WishEntity){
+        wishDao.delete(wish)
+    }
+
+    suspend fun deleteById(id: Long){
+        wishDao.deleteById(id)
     }
 }

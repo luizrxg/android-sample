@@ -37,6 +37,9 @@ abstract class WishDao : EntityDao<WishEntity>() {
     abstract suspend fun criarWish(wish: WishEntity)
 
     @Delete
-    abstract suspend fun deleteWish(wish: WishEntity)
+    abstract suspend fun delete(wish: WishEntity)
+
+    @Query("DELETE FROM wishes WHERE id = :id")
+    abstract suspend fun deleteById(id: Long)
 }
 
