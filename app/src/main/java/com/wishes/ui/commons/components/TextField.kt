@@ -23,13 +23,21 @@ fun TextField(
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: String? = null,
+    maxLength: Int? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ){
     OutlinedTextField(
         value = value,
-        onValueChange = { if (it.length < 20) onValueChange(it) },
+        onValueChange = {
+            if (
+                if(maxLength != null){
+                    it.length < maxLength
+                } else true
+            )
+            onValueChange(it)
+        },
         placeholder = {
             if (placeholder != null)
             Text(

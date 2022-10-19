@@ -22,6 +22,7 @@ fun InputDialog(
     title: String,
     value: String,
     onValueChange: (String) -> Unit,
+    maxLength: Int? = null,
     cancelText: String,
     confirmText: String,
     confirmAction: () -> Unit,
@@ -46,6 +47,7 @@ fun InputDialog(
             TextField(
                 value = value,
                 onValueChange = { onValueChange(it) },
+                maxLength = maxLength,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             Row(

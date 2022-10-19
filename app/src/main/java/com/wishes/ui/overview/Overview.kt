@@ -1,7 +1,5 @@
 package com.wishes.ui.overview
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,8 +39,8 @@ import com.wishes.data.model.Link
 import com.wishes.data.model.Wish
 import com.wishes.database.entity.LinkEntity
 import com.wishes.ui.commons.components.*
-import com.wishes.ui.home.HomeDestination
 import com.wishes.ui.navigation.WishesNavigationDestination
+import com.wishes.util.checkHttps
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -88,12 +87,13 @@ fun OverviewScreen(
     deleteMessage: () -> Unit,
     comprarState: ComprarUiState,
 ) {
-    val context = LocalContext.current
     var comprarExpanded by remember { mutableStateOf(false) }
     var menuExpanded by remember { mutableStateOf(false) }
     var deleteExpanded by remember { mutableStateOf(false) }
     var link by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
 
     comprarState.message?.let { message ->
         LaunchedEffect(message) {
@@ -105,6 +105,8 @@ fun OverviewScreen(
     comprarState.temSaldo?.let { temSaldo ->
         if(temSaldo) onBackClick()
     }
+
+
 
     fun addLink(){
         if (link.isNotEmpty()){
@@ -305,11 +307,8 @@ fun OverviewScreen(
                         )
                     }
                     items(links){ link ->
-
                         if (wish.prioridade < 3)
                         link?.let {
-                            val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(link.link)) }
-
                             Row(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically,
@@ -326,7 +325,7 @@ fun OverviewScreen(
                                             MaterialTheme.shapes.small
                                         )
                                         .clip(MaterialTheme.shapes.small)
-                                        .clickable { context.startActivity(intent) }
+                                        .clickable { uriHandler.openUri(checkHttps(link.link)) }
                                         .padding(16.dp, 12.dp, 12.dp, 12.dp)
                                 ){
                                     Text(

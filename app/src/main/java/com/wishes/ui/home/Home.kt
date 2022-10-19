@@ -35,6 +35,7 @@ import com.wishes.ui.create.CreateDestination
 import com.wishes.ui.navigation.WishesNavigationDestination
 import com.wishes.ui.receipt.ReceiptDestination
 import com.wishes.ui.receipt.ReceiptViewModel
+import com.wishes.util.isBigDecimal
 import java.math.BigDecimal
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
@@ -85,8 +86,10 @@ fun HomeScreen(
     var expanded by remember { mutableStateOf(false) }
     var adicionarExpanded by remember { mutableStateOf(false) }
     var subtrairExpanded by remember { mutableStateOf(false) }
-    var novoSaldo by remember { mutableStateOf("0.0") }
+    var novoSaldo by remember { mutableStateOf("0") }
     val snackbarHostState = remember { SnackbarHostState() }
+
+    fun setNovoSaldo(value: String) { novoSaldo = value }
 
     uiState.message?.let { message ->
         LaunchedEffect(message) {
@@ -201,7 +204,7 @@ fun HomeScreen(
                 InputDialog(
                     title = "Adicionar saldo",
                     value = novoSaldo,
-                    onValueChange = { novoSaldo = it.ifEmpty { "0" } },
+                    onValueChange = { isBigDecimal(it, ::setNovoSaldo) },
                     cancelText = "Voltar",
                     confirmText = "Confirmar",
                     confirmAction = {
@@ -218,7 +221,7 @@ fun HomeScreen(
                 InputDialog(
                     title = "Subtrair saldo",
                     value = novoSaldo,
-                    onValueChange = { novoSaldo = it.ifEmpty { "0" } },
+                    onValueChange = { isBigDecimal(it, ::setNovoSaldo) },
                     cancelText = "Voltar",
                     confirmText = "Confirmar",
                     confirmAction = {

@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -34,6 +35,8 @@ import com.wishes.database.entity.WishEntity
 import com.wishes.ui.commons.components.*
 import com.wishes.ui.navigation.WishesNavigationDestination
 import com.wishes.ui.overview.OverviewViewModel
+import com.wishes.util.checkHttps
+import com.wishes.util.isBigDecimal
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -70,10 +73,13 @@ fun CreateScreen(
     id: Long? = 0
 ) {
     var nome by remember { mutableStateOf("") }
-    var preco by remember { mutableStateOf(BigDecimal.ZERO) }
+    var preco by remember { mutableStateOf("0") }
     var prioridade by remember { mutableStateOf(0) }
     var link by remember { mutableStateOf("") }
     val links = remember { mutableStateListOf<String?>() }
+    val uriHandler = LocalUriHandler.current
+
+    fun setPreco(value: String){ preco = value }
 
     fun addLink(){
         if (link.isNotEmpty()){
@@ -87,7 +93,7 @@ fun CreateScreen(
             WishEntity(
                 id = 0,
                 nome = nome,
-                preco = preco,
+                preco = preco.toBigDecimal(),
                 prioridade = prioridade,
                 comprado = false,
                 data = "${LocalDateTime.now()}"
@@ -140,7 +146,8 @@ fun CreateScreen(
                         )
                         TextField(
                             nome,
-                            { nome = it }
+                            { nome = it },
+                            maxLength = 30
                         )
                         Text(
                             "Preço",
@@ -150,9 +157,9 @@ fun CreateScreen(
                                 .fillMaxWidth()
                                 .padding(start = 16.dp, top = 6.dp)
                         )
-                        NumberField(
+                        TextField(
                             preco,
-                            { preco = it },
+                            { isBigDecimal(it, ::setPreco) },
                             leadingIcon = {
                                 Text(
                                     "R$",
@@ -161,6 +168,7 @@ fun CreateScreen(
                                     color = MaterialTheme.colors.secondary
                                 )
                             },
+                            maxLength = 30,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
                         Text(
@@ -239,7 +247,7 @@ fun CreateScreen(
                                             MaterialTheme.shapes.small
                                         )
                                         .clip(MaterialTheme.shapes.small)
-                                        .clickable {  }
+                                        .clickable { uriHandler.openUri(checkHttps(link)) }
                                         .padding(16.dp, 12.dp, 12.dp, 12.dp)
                                 ){
                                     Text(
