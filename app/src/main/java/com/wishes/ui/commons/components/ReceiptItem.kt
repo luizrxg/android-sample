@@ -26,6 +26,7 @@ import com.wishes.data.model.Wish
 import com.wishes.database.entity.WishEntity
 import com.wishes.R
 import com.wishes.util.formatDayNumberMonthName
+import com.wishes.util.formatDotToPeriod
 import java.time.LocalDateTime
 
 @Composable
@@ -114,13 +115,11 @@ fun ReceiptItem(
                     color = MaterialTheme.colors.secondaryVariant
                 )
                 Text(
-                    "${ if (wish.prioridade == 3) "+" else "-"} R$ ${wish.preco}",
+                    formatDotToPeriod("${ if (wish.prioridade == 3) "+" else "-"} R$ ${wish.preco}"),
                     color =
                         colorResource(
-                            if (wish.prioridade == 3)
-                                R.color.green
-                            else
-                                R.color.red
+                            if (wish.prioridade == 3) R.color.green
+                            else R.color.red
                         ),
                     textAlign = TextAlign.Start,
                     style = MaterialTheme.typography.body1,

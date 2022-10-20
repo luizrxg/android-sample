@@ -2,7 +2,7 @@
 <resources>
 
     <style name="Theme.Wishes" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/primary</item>
-        <item name="android:navigationBarColor">@color/primary</item>
+        <item name="android:statusBarColor">@color/dark</item>
+        <item name="android:navigationBarColor">@color/dark</item>
     </style>
 </resources>

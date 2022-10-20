@@ -41,6 +41,7 @@ import com.wishes.database.entity.LinkEntity
 import com.wishes.ui.commons.components.*
 import com.wishes.ui.navigation.WishesNavigationDestination
 import com.wishes.util.checkHttps
+import com.wishes.util.formatDotToPeriod
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -180,7 +181,7 @@ fun OverviewScreen(
                                 .padding(16.dp, 0.dp)
                                 .clip(RoundedCornerShape(100)),
                             2.dp,
-                            colorResource(R.color.dark),
+                            MaterialTheme.colors.onBackground,
                         )
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -190,62 +191,18 @@ fun OverviewScreen(
                                 .fillMaxWidth()
                         ) {
                             Text(
-                                "R$ ${wish.preco}",
-                                color = MaterialTheme.colors.primary,
+                                formatDotToPeriod("R$ ${wish.preco}"),
+                                color = MaterialTheme.colors.secondary,
                                 textAlign = TextAlign.Start,
                                 style = MaterialTheme.typography.h6,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.SemiBold,
                                 overflow = TextOverflow.Ellipsis,
                                 maxLines = 1,
                                 modifier = Modifier.widthIn(max = 150.dp)
                             )
-                            Icon(
-                                painter = painterResource(
-                                    when (wish.prioridade){
-                                        0 -> { R.drawable.ic_arrow }
-                                        1 -> { R.drawable.ic_arrow2 }
-                                        2 -> { R.drawable.ic_arrow3 }
-                                        3 -> { R.drawable.ic_more_cash }
-                                        4 -> { R.drawable.ic_minus_cash }
-                                        else -> { 0 }
-                                    }
-                                ),
-                                contentDescription = null,
-                                tint =
-                                    when (wish.prioridade){
-                                        0 -> { MaterialTheme.colors.primary }
-                                        1 -> { MaterialTheme.colors.primary }
-                                        2 -> { MaterialTheme.colors.background }
-                                        3 -> { colorResource(R.color.green) }
-                                        4 -> { colorResource(R.color.red) }
-                                        else -> { MaterialTheme.colors.primary }
-                                    },
-                                modifier = Modifier
-                                    .requiredSize(38.dp)
-                                    .background(
-                                        when (wish.prioridade){
-                                            0 -> { Color.Transparent }
-                                            1 -> { Color.Transparent }
-                                            2 -> { MaterialTheme.colors.primary }
-                                            3 -> { Color.Transparent }
-                                            4 -> { Color.Transparent }
-                                            else -> { Color.Transparent }
-                                        },
-                                        RoundedCornerShape(100)
-                                    )
-                                    .border(
-                                        2.dp,
-                                        when (wish.prioridade){
-                                            0 -> { Color.Transparent }
-                                            1 -> { MaterialTheme.colors.primary }
-                                            2 -> { MaterialTheme.colors.primary }
-                                            3 -> { Color.Transparent }
-                                            4 -> { Color.Transparent }
-                                            else -> { Color.Transparent }
-                                        },
-                                        RoundedCornerShape(100)
-                                    )
-                                    .padding(8.dp)
+                            Priority(
+                                level = wish.prioridade,
+                                modifier = Modifier.requiredSize(38.dp)
                             )
                         }
                         Divider(
@@ -254,7 +211,7 @@ fun OverviewScreen(
                                 .padding(16.dp, 0.dp)
                                 .clip(RoundedCornerShape(100)),
                             2.dp,
-                            colorResource(R.color.dark),
+                            MaterialTheme.colors.onBackground,
                         )
                         if (wish.prioridade < 3)
                             Text(
@@ -267,7 +224,7 @@ fun OverviewScreen(
                             )
 
                         if (comprarExpanded)
-                            ConfirmDialog(
+                            Dialog(
                                 title = "Deseja marcar como comprado ?",
                                 cancelText = "Voltar",
                                 confirmText = "Confirmar",
@@ -276,7 +233,7 @@ fun OverviewScreen(
                             )
 
                         if (deleteExpanded)
-                            ConfirmDialog(
+                            Dialog(
                                 title = "Deseja deletar este item ?",
                                 cancelText = "Cancelar",
                                 confirmText = "Deletar",
@@ -321,7 +278,7 @@ fun OverviewScreen(
                                         .fillMaxWidth(.9f)
                                         .padding(0.dp, 4.dp)
                                         .background(
-                                            colorResource(R.color.dark),
+                                            MaterialTheme.colors.onBackground,
                                             MaterialTheme.shapes.small
                                         )
                                         .clip(MaterialTheme.shapes.small)
@@ -352,7 +309,8 @@ fun OverviewScreen(
                                                 link.link
                                             )
                                         )
-                                    }
+                                    },
+                                    modifier = Modifier.padding(start = 8.dp)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Rounded.Remove,
@@ -360,7 +318,6 @@ fun OverviewScreen(
                                         tint = MaterialTheme.colors.secondary,
                                         modifier = Modifier
                                             .requiredSize(32.dp)
-                                            .padding(start = 8.dp)
                                     )
                                 }
                             }

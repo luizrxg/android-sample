@@ -1,6 +1,7 @@
 package com.wishes.ui.commons.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -36,7 +37,7 @@ fun Button(
                     )
                 } else {
                     ButtonDefaults.buttonColors(
-                        containerColor = colorResource(R.color.dark),
+                        containerColor = MaterialTheme.colors.onBackground,
                         contentColor = MaterialTheme.colors.background,
                     )
                 }
@@ -50,7 +51,7 @@ fun Button(
                 } else {
                     ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colors.secondary,
-                        contentColor = colorResource(R.color.dark),
+                        contentColor = MaterialTheme.colors.onBackground,
                     )
                 }
             }
@@ -63,7 +64,7 @@ fun Button(
                 } else {
                     ButtonDefaults.buttonColors(
                         containerColor = Color.Transparent,
-                        contentColor = colorResource(R.color.dark),
+                        contentColor = MaterialTheme.colors.onBackground,
                     )
                 }
             }
@@ -76,7 +77,7 @@ fun Button(
                 } else {
                     ButtonDefaults.buttonColors(
                         containerColor = Color.Transparent,
-                        contentColor = colorResource(R.color.dark),
+                        contentColor = MaterialTheme.colors.onBackground,
                     )
                 }
             }
@@ -90,7 +91,7 @@ fun Button(
                     if (enabled!!)
                         color
                     else
-                        colorResource(R.color.dark)
+                        MaterialTheme.colors.onBackground
                 )
             }
             else null,

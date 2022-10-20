@@ -2,6 +2,7 @@ package com.wishes.ui.commons.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
@@ -11,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.wishes.R
@@ -56,10 +58,10 @@ fun TextField(
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            containerColor = MaterialTheme.colors.background,
+            containerColor = MaterialTheme.colors.onBackground,
             textColor = MaterialTheme.colors.secondary,
-            focusedBorderColor = MaterialTheme.colors.secondary,
-            unfocusedBorderColor = MaterialTheme.colors.secondary,
+            focusedBorderColor = Color.Transparent,
+            unfocusedBorderColor = Color.Transparent,
             cursorColor = MaterialTheme.colors.secondary,
         )
     )

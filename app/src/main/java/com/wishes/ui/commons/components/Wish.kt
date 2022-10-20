@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.wishes.data.model.Wish
 import com.wishes.database.entity.WishEntity
 import com.wishes.R
+import com.wishes.util.formatDotToPeriod
 
 @Composable
 fun Wish(
@@ -54,66 +55,34 @@ fun Wish(
                 .padding(16.dp, 0.dp, 16.dp, 16.dp)
                 .clip(MaterialTheme.shapes.small)
                 .clickable { onClick() }
-                .background(colorResource(R.color.dark))
+                .background(MaterialTheme.colors.onBackground)
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
             Column {
                 Text(
                     wish.nome,
+                    color = MaterialTheme.colors.secondaryVariant,
                     textAlign = TextAlign.Start,
                     style = MaterialTheme.typography.body1,
-                    fontWeight = FontWeight.Bold,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                     modifier = Modifier.widthIn(max = 150.dp)
                 )
                 Text(
-                    "R$ ${wish.preco}",
-                    color = MaterialTheme.colors.primary,
+                    formatDotToPeriod("R$ ${wish.preco}"),
+                    color = MaterialTheme.colors.secondary,
                     textAlign = TextAlign.Start,
                     style = MaterialTheme.typography.h6,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                     modifier = Modifier.widthIn(max = 150.dp)
                 )
             }
-            Icon(
-                painter = painterResource(
-                    when (wish.prioridade){
-                        0 -> { R.drawable.ic_arrow }
-                        1 -> { R.drawable.ic_arrow2 }
-                        2 -> { R.drawable.ic_arrow3 }
-                        3 -> { R.drawable.ic_more_cash }
-                        4 -> { R.drawable.ic_minus_cash }
-                        else -> { 0 }
-                    }
-                ),
-                contentDescription = null,
-                tint =
-                    if (wish.prioridade != 2)
-                        MaterialTheme.colors.primary
-                    else
-                        MaterialTheme.colors.background,
-                modifier = Modifier
-                    .requiredSize(38.dp)
-                    .background(
-                        if (wish.prioridade == 2)
-                            MaterialTheme.colors.primary
-                        else
-                            Color.Transparent,
-                        RoundedCornerShape(100)
-                    )
-                    .border(
-                        2.dp,
-                        if (wish.prioridade != 0)
-                            MaterialTheme.colors.primary
-                        else
-                            Color.Transparent,
-                        RoundedCornerShape(100)
-                    )
-                    .padding(8.dp)
+            Priority(
+                level = wish.prioridade,
+                modifier = Modifier.requiredSize(44.dp)
             )
         }
     }

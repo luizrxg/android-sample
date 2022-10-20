@@ -134,7 +134,7 @@ fun CreateScreen(
                                 .padding(16.dp, 0.dp)
                                 .clip(RoundedCornerShape(100)),
                             2.dp,
-                            colorResource(R.color.dark),
+                            MaterialTheme.colors.onBackground,
                         )
                         Text(
                             "Nome",
@@ -243,7 +243,7 @@ fun CreateScreen(
                                         .fillMaxWidth(.9f)
                                         .padding(0.dp, 4.dp)
                                         .background(
-                                            colorResource(R.color.dark),
+                                            MaterialTheme.colors.onBackground,
                                             MaterialTheme.shapes.small
                                         )
                                         .clip(MaterialTheme.shapes.small)
@@ -266,7 +266,8 @@ fun CreateScreen(
                                     )
                                 }
                                 IconButton(
-                                    onClick = { links.removeAt(index) }
+                                    onClick = { links.removeAt(index) },
+                                    modifier = Modifier.padding(start = 8.dp)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Rounded.Remove,
@@ -274,7 +275,6 @@ fun CreateScreen(
                                         tint = MaterialTheme.colors.secondary,
                                         modifier = Modifier
                                             .requiredSize(32.dp)
-                                            .padding(start = 8.dp)
                                     )
                                 }
                             }

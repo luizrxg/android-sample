@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -28,13 +29,14 @@ import com.wishes.R
 import com.wishes.data.model.Wish
 import com.wishes.database.entity.SaldoEntity
 import com.wishes.ui.commons.components.Button
-import com.wishes.ui.commons.components.InputDialog
+import com.wishes.ui.commons.components.Dialog
 import com.wishes.ui.commons.components.SwipeDismissSnackbarHost
 import com.wishes.ui.commons.components.Wish
 import com.wishes.ui.create.CreateDestination
 import com.wishes.ui.navigation.WishesNavigationDestination
 import com.wishes.ui.receipt.ReceiptDestination
 import com.wishes.ui.receipt.ReceiptViewModel
+import com.wishes.util.formatDotToPeriod
 import com.wishes.util.isBigDecimal
 import java.math.BigDecimal
 
@@ -86,6 +88,7 @@ fun HomeScreen(
     var expanded by remember { mutableStateOf(false) }
     var adicionarExpanded by remember { mutableStateOf(false) }
     var subtrairExpanded by remember { mutableStateOf(false) }
+    var showSaldo by remember { mutableStateOf(true) }
     var novoSaldo by remember { mutableStateOf("0") }
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -133,14 +136,12 @@ fun HomeScreen(
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colors.background)
         ) {
             Column(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colors.primary)
             ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -201,7 +202,7 @@ fun HomeScreen(
                     }
                 }
                 if (adicionarExpanded)
-                InputDialog(
+                Dialog(
                     title = "Adicionar saldo",
                     value = novoSaldo,
                     onValueChange = { isBigDecimal(it, ::setNovoSaldo) },
@@ -218,7 +219,7 @@ fun HomeScreen(
                     onDismiss = { adicionarExpanded = false }
                 )
                 if (subtrairExpanded)
-                InputDialog(
+                Dialog(
                     title = "Subtrair saldo",
                     value = novoSaldo,
                     onValueChange = { isBigDecimal(it, ::setNovoSaldo) },
@@ -230,7 +231,6 @@ fun HomeScreen(
                     },
                     onDismiss = { subtrairExpanded = false }
                 )
-
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -252,12 +252,37 @@ fun HomeScreen(
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 16.sp,
                         )
-                        Text(
-                            "R$ ${saldo ?: 0}",
-                            color = MaterialTheme.colors.secondary,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 20.sp,
-                        )
+                        Row{
+                            Box {
+                                Text(
+                                    formatDotToPeriod("R$ ${saldo ?: 0}"),
+                                    color = if (showSaldo) MaterialTheme.colors.secondary else Color.Transparent,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp,
+                                )
+                                Divider(
+                                    Modifier
+                                        .requiredWidth(48.dp)
+                                        .padding()
+                                        .align(Alignment.Center)
+                                        .clip(RoundedCornerShape(100)),
+                                    2.dp,
+                                    if (showSaldo) Color.Transparent else MaterialTheme.colors.secondary,
+                                )
+                            }
+//                            IconButton(
+//                                onClick = { showSaldo = !showSaldo }
+//                            ) {
+//                                Icon(
+//                                    imageVector =
+//                                        if (showSaldo) Icons.Rounded.VisibilityOff
+//                                        else Icons.Rounded.Visibility,
+//                                    contentDescription = null,
+//                                    tint = MaterialTheme.colors.secondary,
+//                                    modifier = Modifier.requiredSize(20.dp)
+//                                )
+//                            }
+                        }
                     }
                     Button(
                         text = "Ver extrato",
@@ -269,7 +294,8 @@ fun HomeScreen(
             LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .background(MaterialTheme.colors.background)
+                    .shadow(16.dp)
+                    .background(MaterialTheme.colors.background, RoundedCornerShape(3, 3, 0, 0))
                     .fillMaxSize()
             ) {
                 item {
