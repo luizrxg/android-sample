@@ -27,6 +27,7 @@ import com.wishes.database.entity.WishEntity
 import com.wishes.R
 import com.wishes.util.formatDayNumberMonthName
 import com.wishes.util.formatDotToPeriod
+import com.wishes.util.formatHoursMinutes
 import java.time.LocalDateTime
 
 @Composable
@@ -36,9 +37,6 @@ fun ReceiptItem(
     isLast: Boolean,
     onClick: () -> Unit,
 ){
-    val data = LocalDateTime.parse(wish.data)
-    val hora = "${ data.hour }:${ data.minute }"
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -52,11 +50,11 @@ fun ReceiptItem(
                     if (isFirst && isLast) {
                         PaddingValues(0.dp)
                     } else if (isFirst) {
-                        PaddingValues(34.dp, 41.dp, 0.dp, 0.dp)
+                        PaddingValues(37.dp, 41.dp, 0.dp, 0.dp)
                     } else if (isLast) {
-                        PaddingValues(34.dp, 0.dp, 0.dp, 41.dp)
+                        PaddingValues(37.dp, 0.dp, 0.dp, 41.dp)
                     } else {
-                        PaddingValues(34.dp, 0.dp, 0.dp, 0.dp)
+                        PaddingValues(37.dp, 0.dp, 0.dp, 0.dp)
                     }
                 )
                 .requiredHeight(
@@ -68,7 +66,7 @@ fun ReceiptItem(
                         82.dp
                 )
                 .requiredWidth(1.dp)
-                .background(MaterialTheme.colors.secondaryVariant,)
+                .background(MaterialTheme.colors.secondaryVariant)
                 .align(Alignment.CenterStart)
         ){}
         Row(
@@ -80,20 +78,34 @@ fun ReceiptItem(
                 .padding(16.dp, 0.dp)
         ) {
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .background(MaterialTheme.colors.background)
-                    .padding(0.dp, 8.dp)
+                    .padding(0.dp, 0.dp)
             ) {
-                Text(
-                    hora,
-                    style = MaterialTheme.typography.body2,
-                    color = MaterialTheme.colors.secondaryVariant,
-                    textAlign = TextAlign.Center,
+//                Text(
+//                    formatHoursMinutes(wish.data),
+//                    style = MaterialTheme.typography.body2,
+//                    color = MaterialTheme.colors.secondary,
+//                    textAlign = TextAlign.Center,
+//                    modifier = Modifier
+//                        .padding(end = 16.dp)
+//                        .requiredWidth(40.dp)
+//                )
+                Priority(
+                    level = wish.prioridade,
                     modifier = Modifier
-                        .padding(end = 16.dp)
-                        .requiredWidth(40.dp)
+                        .requiredSize(44.dp)
+                        .border(
+                            1.dp,
+                            MaterialTheme.colors.secondaryVariant,
+                            RoundedCornerShape(100)
+                        )
+                        .padding(
+                            if (wish.prioridade > 2) PaddingValues(14.dp, 13.dp, 12.dp, 12.dp)
+                            else PaddingValues(12.dp)
+                        )
                 )
                 Text(
                     wish.nome,
@@ -110,7 +122,7 @@ fun ReceiptItem(
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    formatDayNumberMonthName(data),
+                    formatHoursMinutes(wish.data),
                     style = MaterialTheme.typography.caption,
                     color = MaterialTheme.colors.secondaryVariant
                 )

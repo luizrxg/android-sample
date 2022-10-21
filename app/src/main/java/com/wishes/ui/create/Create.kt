@@ -105,7 +105,7 @@ fun CreateScreen(
 
     Scaffold(
         contentColor = MaterialTheme.colors.secondary,
-        containerColor = MaterialTheme.colors.primary,
+        containerColor = MaterialTheme.colors.onBackground,
         topBar = {
             TopBar(
                 "Criar wish",

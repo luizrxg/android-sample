@@ -68,11 +68,24 @@ fun Button(
                     )
                 }
             }
-            "text" -> {
+            "text-white" -> {
                 if (enabled!!){
                     ButtonDefaults.buttonColors(
                         containerColor = Color.Transparent,
                         contentColor = MaterialTheme.colors.secondary,
+                    )
+                } else {
+                    ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = MaterialTheme.colors.onBackground,
+                    )
+                }
+            }
+            "text-primary" -> {
+                if (enabled!!){
+                    ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = MaterialTheme.colors.primary,
                     )
                 } else {
                     ButtonDefaults.buttonColors(

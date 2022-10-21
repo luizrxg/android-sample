@@ -31,7 +31,7 @@ fun Dialog(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .background(MaterialTheme.colors.onBackground, RoundedCornerShape(10))
+                .background(MaterialTheme.colors.background, RoundedCornerShape(10))
                 .padding(16.dp)
         ){
             Text(
@@ -54,7 +54,7 @@ fun Dialog(
                 Button(
                     text = cancelText,
                     onClick = { onDismiss() },
-                    variant = "text",
+                    variant = "text-white",
                     modifier = Modifier
                         .weight(.5f)
                         .padding(end = 8.dp)
@@ -116,7 +116,7 @@ fun Dialog(
                 Button(
                     text = cancelText,
                     onClick = { onDismiss() },
-                    variant = "text",
+                    variant = "text-white",
                     modifier = Modifier
                         .weight(.5f)
                         .padding(end = 8.dp)

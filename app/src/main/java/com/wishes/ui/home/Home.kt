@@ -252,36 +252,47 @@ fun HomeScreen(
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 16.sp,
                         )
-                        Row{
-                            Box {
-                                Text(
-                                    formatDotToPeriod("R$ ${saldo ?: 0}"),
-                                    color = if (showSaldo) MaterialTheme.colors.secondary else Color.Transparent,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 20.sp,
-                                )
-                                Divider(
-                                    Modifier
-                                        .requiredWidth(48.dp)
-                                        .padding()
-                                        .align(Alignment.Center)
-                                        .clip(RoundedCornerShape(100)),
-                                    2.dp,
-                                    if (showSaldo) Color.Transparent else MaterialTheme.colors.secondary,
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ){
+                            Text(
+                                "R$",
+                                color = MaterialTheme.colors.secondary,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                            )
+                            Text(
+                                formatDotToPeriod("${saldo ?: "00"}"),
+                                color = MaterialTheme.colors.secondary,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                modifier =
+                                    if (showSaldo){
+                                        Modifier
+                                    } else {
+                                        Modifier
+                                            .requiredHeight(2.dp)
+                                            .padding(start = 8.dp)
+                                            .background(
+                                                MaterialTheme.colors.secondary,
+                                                RoundedCornerShape(100)
+                                            )
+                                    }
+                            )
+                            IconButton(
+                                onClick = { showSaldo = !showSaldo },
+                                modifier = Modifier.requiredHeight(18.dp)
+                            ) {
+                                Icon(
+                                    imageVector =
+                                        if (showSaldo) Icons.Rounded.VisibilityOff
+                                        else Icons.Rounded.Visibility,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colors.secondary,
+                                    modifier = Modifier.requiredSize(24.dp)
                                 )
                             }
-//                            IconButton(
-//                                onClick = { showSaldo = !showSaldo }
-//                            ) {
-//                                Icon(
-//                                    imageVector =
-//                                        if (showSaldo) Icons.Rounded.VisibilityOff
-//                                        else Icons.Rounded.Visibility,
-//                                    contentDescription = null,
-//                                    tint = MaterialTheme.colors.secondary,
-//                                    modifier = Modifier.requiredSize(20.dp)
-//                                )
-//                            }
                         }
                     }
                     Button(

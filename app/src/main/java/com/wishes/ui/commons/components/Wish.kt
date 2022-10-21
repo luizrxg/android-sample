@@ -82,7 +82,9 @@ fun Wish(
             }
             Priority(
                 level = wish.prioridade,
-                modifier = Modifier.requiredSize(44.dp)
+                modifier = Modifier
+                    .requiredSize(44.dp)
+                    .padding(8.dp)
             )
         }
     }

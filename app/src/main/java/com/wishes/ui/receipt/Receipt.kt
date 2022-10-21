@@ -30,6 +30,9 @@ import com.wishes.database.entity.SaldoEntity
 import com.wishes.ui.commons.components.*
 import com.wishes.ui.create.CreateDestination
 import com.wishes.ui.navigation.WishesNavigationDestination
+import com.wishes.util.checkSameDay
+import com.wishes.util.formatDayNumberMonthName
+import java.time.LocalDateTime
 import java.math.BigDecimal
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
@@ -66,7 +69,6 @@ fun ReceiptScreen(
     items: LazyPagingItems<Wish>,
     itemsMes: LazyPagingItems<Wish>,
 ) {
-
     var filtroExpanded by remember { mutableStateOf(false)}
     var selectedItems by remember { mutableStateOf(items)}
 
@@ -125,10 +127,23 @@ fun ReceiptScreen(
             ) {
                 itemsIndexed(selectedItems) { index, obj ->
                     obj?.let {
+                        val isSameDay = index == 0 || !(checkSameDay(selectedItems[index - 1]!!.data, obj.data))
+                        val isNextSameDay =
+                            if (index + 1 < selectedItems.itemCount){
+                                !(checkSameDay(selectedItems[index + 1]?.data ?: obj.data, obj.data))
+                            } else true
+
+                        if (isSameDay)
+                            Text(
+                                formatDayNumberMonthName(obj.data),
+                                style = MaterialTheme.typography.body1,
+                                fontWeight = FontWeight.Bold,
+                            )
+
                         ReceiptItem(
                             obj,
-                            index == 0,
-                            index == selectedItems.itemCount - 1,
+                            index == 0 || isSameDay,
+                            index == selectedItems.itemCount - 1 || isNextSameDay,
                             { onNavigateToOverview(obj.id) },
                         )
                     }

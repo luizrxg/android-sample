@@ -106,9 +106,6 @@ fun OverviewScreen(
     comprarState.temSaldo?.let { temSaldo ->
         if(temSaldo) onBackClick()
     }
-
-
-
     fun addLink(){
         if (link.isNotEmpty()){
             criarLink(
@@ -124,7 +121,7 @@ fun OverviewScreen(
 
     Scaffold(
         contentColor = MaterialTheme.colors.secondary,
-        containerColor = MaterialTheme.colors.primary,
+        containerColor = MaterialTheme.colors.onBackground,
         topBar = {
             TopBar(
                 wish?.nome ?: "",
@@ -202,7 +199,9 @@ fun OverviewScreen(
                             )
                             Priority(
                                 level = wish.prioridade,
-                                modifier = Modifier.requiredSize(38.dp)
+                                modifier = Modifier
+                                    .requiredSize(38.dp)
+                                    .padding(8.dp)
                             )
                         }
                         Divider(
@@ -228,7 +227,10 @@ fun OverviewScreen(
                                 title = "Deseja marcar como comprado ?",
                                 cancelText = "Voltar",
                                 confirmText = "Confirmar",
-                                confirmAction = { comprar() },
+                                confirmAction = {
+                                    comprar()
+                                    onBackClick()
+                                },
                                 onDismiss = { comprarExpanded = false }
                             )
 
