@@ -99,12 +99,35 @@ fun ReceiptScreen(
                             .align(Alignment.CenterStart)
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Todos") },
-                            onClick = { selectedItems = items }
+                            text = {
+                                Text(
+                                    "Todos",
+                                    color =
+                                    if (selectedItems == items){
+                                        MaterialTheme.colors.secondaryVariant
+                                    } else {
+                                        MaterialTheme.colors.background
+                                    }
+                                )
+                            },
+                            onClick = { selectedItems = items },
+                            colors = MenuDefaults.itemColors(
+
+                            ),
                         )
                         DropdownMenuItem(
-                            text = { Text("Ultimo Mês") },
-                            onClick = { selectedItems = items }
+                            text = {
+                                Text(
+                                    "Ultimo Mês",
+                                    color =
+                                    if (selectedItems == itemsMes){
+                                        MaterialTheme.colors.secondaryVariant
+                                    } else {
+                                        MaterialTheme.colors.background
+                                    }
+                                )
+                            },
+                            onClick = { selectedItems = itemsMes }
                         )
                     }
                 }

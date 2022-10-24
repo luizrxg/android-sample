@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -148,7 +149,7 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp, 12.dp, 8.dp, 0.dp)
+                        .padding(16.dp, 12.dp, 8.dp, 0.dp)
                 ){
                     Icon(
                         painter = painterResource(R.drawable.ic_logo),
@@ -243,9 +244,9 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp, 4.dp, 20.dp, 24.dp)
+                        .padding(16.dp, 4.dp, 16.dp, 24.dp)
                 ){
-                    Column {
+                    Column() {
                         Text(
                             "Saldo atual",
                             color = MaterialTheme.colors.secondary,
@@ -253,7 +254,7 @@ fun HomeScreen(
                             fontSize = 16.sp,
                         )
                         Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.CenterVertically,
                         ){
                             Text(
@@ -261,6 +262,7 @@ fun HomeScreen(
                                 color = MaterialTheme.colors.secondary,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp,
+                                overflow = TextOverflow.Ellipsis,
                             )
                             Text(
                                 formatDotToPeriod("${saldo ?: "00"}"),
@@ -270,10 +272,11 @@ fun HomeScreen(
                                 modifier =
                                     if (showSaldo){
                                         Modifier
+                                            .padding(start = 10.dp)
                                     } else {
                                         Modifier
                                             .requiredHeight(2.dp)
-                                            .padding(start = 8.dp)
+                                            .padding(start = 10.dp)
                                             .background(
                                                 MaterialTheme.colors.secondary,
                                                 RoundedCornerShape(100)
@@ -296,9 +299,10 @@ fun HomeScreen(
                         }
                     }
                     Button(
-                        text = "Ver extrato",
+                        text = "Extrato",
                         onClick = { onNavigateToDestination(ReceiptDestination, ReceiptDestination.route) },
-                        variant = "translucent"
+                        variant = "translucent",
+                        modifier = Modifier.requiredWidth(148.dp)
                     )
                 }
             }
