@@ -3,6 +3,7 @@ package com.wishes.ui.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
@@ -37,6 +38,7 @@ import com.wishes.ui.create.CreateDestination
 import com.wishes.ui.navigation.WishesNavigationDestination
 import com.wishes.ui.receipt.ReceiptDestination
 import com.wishes.ui.receipt.ReceiptViewModel
+import com.wishes.ui.simulation.SimulationDestination
 import com.wishes.util.formatDotToPeriod
 import com.wishes.util.isBigDecimal
 import java.math.BigDecimal
@@ -109,21 +111,6 @@ fun HomeScreen(
     Scaffold(
         contentColor = MaterialTheme.colors.secondary,
         containerColor = MaterialTheme.colors.primary,
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { onNavigateToDestination(CreateDestination, CreateDestination.route) },
-                containerColor = MaterialTheme.colors.primary,
-                contentColor = MaterialTheme.colors.secondary,
-                shape = RoundedCornerShape(100)
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Add,
-                    contentDescription = null,
-                    tint = MaterialTheme.colors.secondary,
-
-                )
-            }
-        },
         snackbarHost = {
             SwipeDismissSnackbarHost(
                 hostState = snackbarHostState,
@@ -132,144 +119,103 @@ fun HomeScreen(
             )
         }
     ) {
-        Column(
+        LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colors.background)
         ) {
-            Column(
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
+            item {
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp, 12.dp, 8.dp, 0.dp)
-                ){
-                    Icon(
-                        painter = painterResource(R.drawable.ic_logo),
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.secondary,
-                        modifier = Modifier.requiredHeight(38.dp)
-                    )
-                    Box {
-                        IconButton(
-                            onClick = { expanded = !expanded }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.MoreVert,
-                                contentDescription = null,
-                                tint = MaterialTheme.colors.secondary,
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                            modifier = Modifier
-                                .background(MaterialTheme.colors.secondary)
-                                .clip(MaterialTheme.shapes.small)
-                                .align(Alignment.CenterStart)
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Adicionar saldo") },
-                                onClick = { adicionarExpanded = !adicionarExpanded },
-                                leadingIcon = {
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_more_cash),
-                                        contentDescription = null,
-                                        modifier = Modifier.requiredSize(32.dp)
-                                    )
-                                }
-                            )
-                            if (saldo != null)
-                            DropdownMenuItem(
-                                text = { Text("Subtrair saldo") },
-                                onClick = { subtrairExpanded = !subtrairExpanded },
-                                leadingIcon = {
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_minus_cash),
-                                        contentDescription = null,
-                                        modifier = Modifier.requiredSize(32.dp)
-                                    )
-                                }
-                            )
-                        }
-
-                    }
-                }
-                if (adicionarExpanded)
-                Dialog(
-                    title = "Adicionar saldo",
-                    value = novoSaldo,
-                    onValueChange = { isBigDecimal(it, ::setNovoSaldo) },
-                    cancelText = "Voltar",
-                    confirmText = "Confirmar",
-                    confirmAction = {
-                        if (saldo != null) {
-                            adicionarSaldo(novoSaldo.toBigDecimal())
-                        } else {
-                            criarSaldo(SaldoEntity(0, novoSaldo.toBigDecimal()))
-                        }
-                        novoSaldo = "0"
-                    },
-                    onDismiss = { adicionarExpanded = false }
-                )
-                if (subtrairExpanded)
-                Dialog(
-                    title = "Subtrair saldo",
-                    value = novoSaldo,
-                    onValueChange = { isBigDecimal(it, ::setNovoSaldo) },
-                    cancelText = "Voltar",
-                    confirmText = "Confirmar",
-                    confirmAction = {
-                        subtrairSaldo(novoSaldo.toBigDecimal())
-                        novoSaldo = "0"
-                    },
-                    onDismiss = { subtrairExpanded = false }
-                )
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp, 10.dp, 10.dp, 20.dp),
-                    thickness = 1.dp,
-                    color = Color.Black.copy(.2f),
-                )
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp, 4.dp, 16.dp, 24.dp)
-                ){
-                    Column() {
-                        Text(
-                            "Saldo atual",
-                            color = MaterialTheme.colors.secondary,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 16.sp,
+                        .background(MaterialTheme.colors.primary)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp, 12.dp, 8.dp, 0.dp)
+                    ){
+                        Icon(
+                            painter = painterResource(R.drawable.ic_logo),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.secondary,
+                            modifier = Modifier.requiredHeight(38.dp)
                         )
-                        Row(
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ){
+                    }
+                    if (adicionarExpanded)
+                        Dialog(
+                            title = "Adicionar saldo",
+                            value = novoSaldo,
+                            onValueChange = { isBigDecimal(it, ::setNovoSaldo) },
+                            cancelText = "Voltar",
+                            confirmText = "Confirmar",
+                            confirmAction = {
+                                if (saldo != null) {
+                                    adicionarSaldo(novoSaldo.toBigDecimal())
+                                } else {
+                                    criarSaldo(SaldoEntity(0, novoSaldo.toBigDecimal()))
+                                }
+                                novoSaldo = "0"
+                            },
+                            onDismiss = { adicionarExpanded = false }
+                        )
+                    if (subtrairExpanded)
+                        Dialog(
+                            title = "Subtrair saldo",
+                            value = novoSaldo,
+                            onValueChange = { isBigDecimal(it, ::setNovoSaldo) },
+                            cancelText = "Voltar",
+                            confirmText = "Confirmar",
+                            confirmAction = {
+                                subtrairSaldo(novoSaldo.toBigDecimal())
+                                novoSaldo = "0"
+                            },
+                            onDismiss = { subtrairExpanded = false }
+                        )
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp, 10.dp, 10.dp, 20.dp),
+                        thickness = 1.dp,
+                        color = Color.Black.copy(.2f),
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp, 4.dp, 16.dp, 20.dp)
+                    ){
+                        Column {
                             Text(
-                                "R$",
+                                "Saldo atual",
                                 color = MaterialTheme.colors.secondary,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp,
-                                overflow = TextOverflow.Ellipsis,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 16.sp,
                             )
-                            Text(
-                                formatDotToPeriod("${saldo ?: "00"}"),
-                                color = MaterialTheme.colors.secondary,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp,
-                                modifier =
+                            Row(
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ){
+                                Text(
+                                    "R$",
+                                    color = MaterialTheme.colors.secondary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp,
+                                )
+                                Text(
+                                    formatDotToPeriod("${saldo ?: "0.00"}"),
+                                    color = MaterialTheme.colors.secondary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp,
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 1,
+                                    modifier =
                                     if (showSaldo){
                                         Modifier
                                             .padding(start = 10.dp)
@@ -282,52 +228,104 @@ fun HomeScreen(
                                                 RoundedCornerShape(100)
                                             )
                                     }
-                            )
-                            IconButton(
-                                onClick = { showSaldo = !showSaldo },
-                                modifier = Modifier.requiredHeight(18.dp)
-                            ) {
-                                Icon(
-                                    imageVector =
+                                )
+                                IconButton(
+                                    onClick = { showSaldo = !showSaldo },
+                                    modifier = Modifier.requiredHeight(18.dp)
+                                ) {
+                                    Icon(
+                                        imageVector =
                                         if (showSaldo) Icons.Rounded.VisibilityOff
                                         else Icons.Rounded.Visibility,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colors.secondary,
-                                    modifier = Modifier.requiredSize(24.dp)
-                                )
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colors.secondary,
+                                        modifier = Modifier.requiredSize(24.dp)
+                                    )
+                                }
                             }
                         }
+                        Button(
+                            text = "Extrato",
+                            onClick = { onNavigateToDestination(ReceiptDestination, ReceiptDestination.route) },
+                            variant = "translucent",
+                            modifier = Modifier.requiredWidth(148.dp)
+                        )
                     }
-                    Button(
-                        text = "Extrato",
-                        onClick = { onNavigateToDestination(ReceiptDestination, ReceiptDestination.route) },
-                        variant = "translucent",
-                        modifier = Modifier.requiredWidth(148.dp)
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(0.dp, 0.dp, 0.dp, 16.dp)
+                    ){
+                        item {
+                            Button(
+                                text = "Criar wish",
+                                onClick = { onNavigateToDestination(CreateDestination, CreateDestination.route) },
+                                variant = "translucent",
+                                box = true,
+                                painterIcon = painterResource(R.drawable.ic_star),
+                                modifier = Modifier.padding(start = 16.dp, end = 8.dp)
+                            )
+                            Button(
+                                text = "Adicionar saldo",
+                                onClick = { adicionarExpanded = !adicionarExpanded },
+                                variant = "translucent",
+                                box = true,
+                                painterIcon = painterResource(R.drawable.ic_more_cash),
+                                modifier = Modifier.padding(8.dp, 0.dp)
+                            )
+                            if (saldo != null)
+                                Button(
+                                    text = "Subtrair saldo",
+                                    onClick = { subtrairExpanded = !subtrairExpanded },
+                                    variant = "translucent",
+                                    box = true,
+                                    painterIcon = painterResource(R.drawable.ic_minus_cash),
+                                    modifier = Modifier.padding(8.dp, 0.dp)
+                                )
+                            Button(
+                                text = "Simular gastos",
+                                onClick = { onNavigateToDestination(SimulationDestination, SimulationDestination.route) },
+                                variant = "translucent",
+                                box = true,
+                                imageVectorIcon = Icons.Rounded.List,
+                                modifier = Modifier.padding(8.dp, 0.dp)
+                            )
+                            Button(
+                                text = "Configurar salário",
+                                onClick = {  },
+                                variant = "translucent",
+                                box = true,
+                                imageVectorIcon = Icons.Rounded.List,
+                                modifier = Modifier.padding(start = 8.dp, end = 16.dp)
+                            )
+                        }
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .requiredHeight(16.dp)
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colors.primary)
+                ){
+                    Box(
+                        modifier = Modifier
+                            .requiredHeight(16.dp)
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colors.background, RoundedCornerShape(80, 80, 0, 0))
                     )
                 }
             }
-            LazyColumn(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .shadow(16.dp)
-                    .background(MaterialTheme.colors.background, RoundedCornerShape(3, 3, 0, 0))
-                    .fillMaxSize()
-            ) {
-                item {
-                    Spacer(modifier = Modifier.requiredHeight(16.dp))
-                }
-                items(wishes) { obj ->
-                    obj?.let {
-                        if (!obj.comprado){
-                            Wish(
-                                obj,
-                                { onNavigateToOverview(obj.id) }
-                            )
-                        }
+            items(wishes) { obj ->
+                obj?.let {
+                    if (!obj.comprado){
+                        Wish(
+                            obj,
+                            { onNavigateToOverview(obj.id) },
+                            false
+                        )
                     }
-                }
-                item {
-                    Spacer(modifier = Modifier.requiredHeight(64.dp))
                 }
             }
         }

@@ -3,6 +3,7 @@ package com.wishes.ui.receipt
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
@@ -134,42 +135,35 @@ fun ReceiptScreen(
             }
         }
     ) {
-        Column(
+        LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .topPadding()
+                .background(MaterialTheme.colors.background, RoundedCornerShape(5, 5, 0, 0))
                 .fillMaxSize()
-                .background(MaterialTheme.colors.background)
         ) {
-            LazyColumn(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .background(MaterialTheme.colors.background)
-                    .fillMaxSize()
-            ) {
-                itemsIndexed(selectedItems) { index, obj ->
-                    obj?.let {
-                        val isSameDay = index == 0 || !(checkSameDay(selectedItems[index - 1]!!.data, obj.data))
-                        val isNextSameDay =
-                            if (index + 1 < selectedItems.itemCount){
-                                !(checkSameDay(selectedItems[index + 1]?.data ?: obj.data, obj.data))
-                            } else true
+            itemsIndexed(selectedItems) { index, obj ->
+                obj?.let {
+                    val isSameDay = index == 0 || !(checkSameDay(selectedItems[index - 1]!!.data, obj.data))
+                    val isNextSameDay =
+                        if (index + 1 < selectedItems.itemCount){
+                            !(checkSameDay(selectedItems[index + 1]?.data ?: obj.data, obj.data))
+                        } else true
 
-                        if (isSameDay)
-                            Text(
-                                formatDayNumberMonthName(obj.data),
-                                style = MaterialTheme.typography.body1,
-                                fontWeight = FontWeight.Bold,
-                            )
-
-                        ReceiptItem(
-                            obj,
-                            index == 0 || isSameDay,
-                            index == selectedItems.itemCount - 1 || isNextSameDay,
-                            { onNavigateToOverview(obj.id) },
+                    if (isSameDay)
+                        Text(
+                            formatDayNumberMonthName(obj.data),
+                            style = MaterialTheme.typography.body1,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = if (index == 0) 16.dp else 0.dp)
                         )
-                    }
+
+                    ReceiptItem(
+                        obj,
+                        index == 0 || isSameDay,
+                        index == selectedItems.itemCount - 1 || isNextSameDay,
+                        { onNavigateToOverview(obj.id) },
+                    )
                 }
             }
         }

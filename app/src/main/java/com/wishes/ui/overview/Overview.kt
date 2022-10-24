@@ -1,7 +1,6 @@
 package com.wishes.ui.overview
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,20 +8,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.material.icons.rounded.OpenInNew
-import androidx.compose.material.icons.rounded.Remove
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,12 +26,13 @@ import androidx.navigation.NavDestination
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
-import com.wishes.R
 import com.wishes.data.model.Link
 import com.wishes.data.model.Wish
 import com.wishes.database.entity.LinkEntity
 import com.wishes.ui.commons.components.*
 import com.wishes.ui.navigation.WishesNavigationDestination
+import com.wishes.ui.overview.ComprarUiState
+import com.wishes.ui.overview.OverviewViewModel
 import com.wishes.util.checkHttps
 import com.wishes.util.formatDotToPeriod
 
@@ -93,7 +86,6 @@ fun OverviewScreen(
     var deleteExpanded by remember { mutableStateOf(false) }
     var link by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
 
     comprarState.message?.let { message ->
@@ -106,6 +98,7 @@ fun OverviewScreen(
     comprarState.temSaldo?.let { temSaldo ->
         if(temSaldo) onBackClick()
     }
+
     fun addLink(){
         if (link.isNotEmpty()){
             criarLink(
@@ -121,7 +114,7 @@ fun OverviewScreen(
 
     Scaffold(
         contentColor = MaterialTheme.colors.secondary,
-        containerColor = MaterialTheme.colors.onBackground,
+        containerColor = MaterialTheme.colors.primary,
         topBar = {
             TopBar(
                 wish?.nome ?: "",
@@ -147,7 +140,15 @@ fun OverviewScreen(
                     ) {
                         DropdownMenuItem(
                             text = { Text("Deletar item") },
-                            onClick = { deleteExpanded = !deleteExpanded }
+                            onClick = { deleteExpanded = !deleteExpanded },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Rounded.Delete,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .requiredSize(24.dp)
+                                )
+                            }
                         )
                     }
                 }
@@ -169,17 +170,10 @@ fun OverviewScreen(
                     modifier = Modifier
                         .topPadding()
                         .fillMaxSize()
-                        .background(MaterialTheme.colors.background)
+                        .padding(bottom = 70.dp)
+                        .background(MaterialTheme.colors.background, RoundedCornerShape(5, 5, 0, 0))
                 ) {
                     item{
-                        Divider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp, 0.dp)
-                                .clip(RoundedCornerShape(100)),
-                            2.dp,
-                            MaterialTheme.colors.onBackground,
-                        )
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically,
@@ -212,15 +206,14 @@ fun OverviewScreen(
                             2.dp,
                             MaterialTheme.colors.onBackground,
                         )
-                        if (wish.prioridade < 3)
-                            Text(
-                                "Links",
-                                textAlign = TextAlign.Start,
-                                style = MaterialTheme.typography.body1,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 16.dp, top = 6.dp)
-                            )
+                        Text(
+                            "Links",
+                            textAlign = TextAlign.Start,
+                            style = MaterialTheme.typography.body1,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 16.dp, top = 6.dp)
+                        )
 
                         if (comprarExpanded)
                             Dialog(
@@ -245,7 +238,6 @@ fun OverviewScreen(
                                 },
                                 onDismiss = { deleteExpanded = false }
                             )
-                        if (wish.prioridade < 3)
                         TextField(
                             link,
                             { link = it },
@@ -266,7 +258,6 @@ fun OverviewScreen(
                         )
                     }
                     items(links){ link ->
-                        if (wish.prioridade < 3)
                         link?.let {
                             Row(
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -338,7 +329,7 @@ fun OverviewScreen(
                             variant = "filled",
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp, 16.dp)
+                                .padding(16.dp)
                                 .requiredHeight(48.dp)
                         )
                     }

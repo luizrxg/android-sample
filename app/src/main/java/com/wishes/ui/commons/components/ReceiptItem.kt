@@ -40,7 +40,7 @@ fun ReceiptItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable { if (wish.prioridade < 3) onClick() }
             .requiredHeight(82.dp)
     ){
         Row(
@@ -84,15 +84,6 @@ fun ReceiptItem(
                     .background(MaterialTheme.colors.background)
                     .padding(0.dp, 0.dp)
             ) {
-//                Text(
-//                    formatHoursMinutes(wish.data),
-//                    style = MaterialTheme.typography.body2,
-//                    color = MaterialTheme.colors.secondary,
-//                    textAlign = TextAlign.Center,
-//                    modifier = Modifier
-//                        .padding(end = 16.dp)
-//                        .requiredWidth(40.dp)
-//                )
                 Priority(
                     level = wish.prioridade,
                     modifier = Modifier

@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import com.wishes.R
@@ -31,7 +32,7 @@ fun TopBar(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
-            .background(MaterialTheme.colors.background)
+            .background(MaterialTheme.colors.primary)
             .requiredHeight(58.dp)
     ){
         Box(
@@ -56,9 +57,11 @@ fun TopBar(
                 color = MaterialTheme.colors.secondary,
                 style = MaterialTheme.typography.h6,
                 fontWeight = FontWeight.Bold,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
                 modifier = Modifier
                     .align(Alignment.CenterStart)
-                    .padding(start = 48.dp)
+                    .padding(48.dp, 0.dp)
             )
             action?.let {
                 Box(modifier = Modifier.align(Alignment.CenterEnd)){

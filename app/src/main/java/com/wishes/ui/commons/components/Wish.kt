@@ -4,45 +4,36 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ShoppingBag
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.wishes.data.model.Wish
-import com.wishes.database.entity.WishEntity
 import com.wishes.R
+import com.wishes.data.model.Wish
 import com.wishes.util.formatDotToPeriod
 
 @Composable
 fun Wish(
     wish: Wish,
     onClick: () -> Unit,
+    selected: Boolean
 ){
-    @Composable
-    fun getPriorityColor(): Color? {
-        return when(wish.prioridade){
-            0 -> { MaterialTheme.colors.primary }
-            1 -> { MaterialTheme.colors.primary }
-            2 -> { MaterialTheme.colors.background }
-            3 -> { colorResource(R.color.green) }
-            4 -> { colorResource(R.color.red) }
-            else -> { null }
+    val color = colorResource(
+        when (wish.prioridade){
+            0 -> { R.color.priority1 }
+            1 -> { R.color.priority2 }
+            2 -> { R.color.priority3 }
+            else -> { 0 }
         }
-    }
+    )
 
     Box(
         modifier = Modifier
@@ -56,6 +47,14 @@ fun Wish(
                 .clip(MaterialTheme.shapes.small)
                 .clickable { onClick() }
                 .background(MaterialTheme.colors.onBackground)
+                .border(
+                    2.dp,
+                    if (selected)
+                        MaterialTheme.colors.secondary
+                    else
+                        MaterialTheme.colors.onBackground,
+                    MaterialTheme.shapes.small
+                )
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
@@ -87,5 +86,13 @@ fun Wish(
                     .padding(8.dp)
             )
         }
+        Row(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .requiredWidth(4.dp)
+                .requiredHeight(50.dp)
+                .padding(end = 16.dp)
+                .background(color)
+        ) {}
     }
 }

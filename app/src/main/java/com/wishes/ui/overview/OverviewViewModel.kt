@@ -11,7 +11,6 @@ import com.wishes.data.repository.LinkRepository
 import com.wishes.data.repository.SaldoRepository
 import com.wishes.data.repository.WishRepository
 import com.wishes.database.entity.LinkEntity
-import com.wishes.database.entity.WishEntity
 import com.wishes.ui.commons.UiMessage
 import com.wishes.ui.commons.UiMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel

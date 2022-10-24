@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -29,15 +28,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
-import com.wishes.R
-import com.wishes.database.entity.LinkEntity
 import com.wishes.database.entity.WishEntity
 import com.wishes.ui.commons.components.*
 import com.wishes.ui.navigation.WishesNavigationDestination
-import com.wishes.ui.overview.OverviewViewModel
 import com.wishes.util.checkHttps
 import com.wishes.util.isBigDecimal
-import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
@@ -105,7 +100,7 @@ fun CreateScreen(
 
     Scaffold(
         contentColor = MaterialTheme.colors.secondary,
-        containerColor = MaterialTheme.colors.onBackground,
+        containerColor = MaterialTheme.colors.primary,
         topBar = {
             TopBar(
                 "Criar wish",
@@ -119,30 +114,24 @@ fun CreateScreen(
             modifier = Modifier
                 .topPadding()
                 .fillMaxSize()
-                .background(MaterialTheme.colors.background)
+                .background(MaterialTheme.colors.background, RoundedCornerShape(5, 5, 0, 0))
         ) {
             Box {
                 LazyColumn(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.Top,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 70.dp)
                 ){
                     item {
-                        Divider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp, 0.dp)
-                                .clip(RoundedCornerShape(100)),
-                            2.dp,
-                            MaterialTheme.colors.onBackground,
-                        )
                         Text(
                             "Nome",
                             textAlign = TextAlign.Start,
                             style = MaterialTheme.typography.body1,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, top = 6.dp)
+                                .padding(start = 16.dp, top = 16.dp)
                         )
                         TextField(
                             nome,
@@ -292,7 +281,7 @@ fun CreateScreen(
                         variant = "filled",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp, 16.dp)
+                            .padding(16.dp)
                             .requiredHeight(48.dp)
                     )
                 }

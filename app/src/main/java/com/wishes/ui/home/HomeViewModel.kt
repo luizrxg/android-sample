@@ -1,20 +1,16 @@
 package com.wishes.ui.home
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.wishes.data.domain.BuscarWishes
-import com.wishes.data.model.Wish
 import com.wishes.data.repository.SaldoRepository
 import com.wishes.data.repository.WishRepository
 import com.wishes.database.entity.SaldoEntity
 import com.wishes.database.entity.WishEntity
 import com.wishes.ui.commons.UiMessage
 import com.wishes.ui.commons.UiMessageManager
-import com.wishes.ui.overview.ComprarUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

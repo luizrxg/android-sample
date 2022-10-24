@@ -36,11 +36,6 @@ fun WishesApp(
             drawerScrimColor = MaterialTheme.colors.primary.copy(.7f),
             drawerBackgroundColor = MaterialTheme.colors.primary,
             drawerGesturesEnabled = state.drawerState.isOpen,
-            bottomBar = {
-                if (appState.shouldShowBottomBar){
-
-                }
-            }
         ) { padding ->
             WishesNavHost(
                 navController = appState.navController,

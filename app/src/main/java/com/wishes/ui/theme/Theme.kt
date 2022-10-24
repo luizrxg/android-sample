@@ -12,7 +12,8 @@ private val DarkColorPalette = darkColors(
     secondary = DarkSecondaryColor,
     primaryVariant = DarkPrimaryVariantColor,
     background = DarkBackgroundColor,
-    onBackground = DarkOnBackgroundColor
+    onBackground = DarkOnBackgroundColor,
+    onPrimary = OnPrimaryColor
 )
 
 private val ColorPalette = lightColors(
@@ -21,7 +22,8 @@ private val ColorPalette = lightColors(
     secondary = LightSecondaryColor,
     primaryVariant = LightPrimaryVariantColor,
     background = LightBackgroundColor,
-    onBackground = LightOnBackgroundColor
+    onBackground = LightOnBackgroundColor,
+    onPrimary = OnPrimaryColor
 )
 
 @Composable
@@ -29,8 +31,8 @@ fun WishesTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-//    val colors = if (darkTheme) DarkColorPalette else ColorPalette
-    val colors = DarkColorPalette
+    val colors = if (darkTheme) DarkColorPalette else ColorPalette
+//    val colors = DarkColorPalette
 
     MaterialTheme(
         colors = colors,

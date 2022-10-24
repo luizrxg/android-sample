@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#FFFB4D3D</color>
+    <color name="primary">#FF822AF2</color>
     <color name="background">#FF181818</color>
     <color name="dark">#FF2C2C2C</color>
     <color name="white">#FFF5F5F5</color>
     <color name="red">#FFFF002E</color>
     <color name="green">#FF2EB67D</color>
     <color name="yellow">#FFFFB800</color>
+    <color name="priority1">#FFFFD500</color>
+    <color name="priority2">#FFFF6500</color>
+    <color name="priority3">#FFFF0000</color>
 </resources>

@@ -39,14 +39,6 @@ fun Dialog(
                 style = MaterialTheme.typography.h6,
                 textAlign = TextAlign.Center
             )
-            Divider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(0.dp, 16.dp)
-                    .clip(RoundedCornerShape(100)),
-                .5.dp,
-                MaterialTheme.colors.secondaryVariant,
-            )
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,

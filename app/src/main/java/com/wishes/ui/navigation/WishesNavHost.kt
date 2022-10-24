@@ -15,6 +15,7 @@ import com.wishes.ui.home.home
 import com.wishes.ui.overview.OverviewDestination
 import com.wishes.ui.overview.overview
 import com.wishes.ui.receipt.receipt
+import com.wishes.ui.simulation.simulation
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -69,6 +70,12 @@ fun WishesNavHost(
                     OverviewDestination, OverviewDestination.createNavigationRoute(id)
                 )
             },
+        )
+        simulation(
+            onNavigateToDestination,
+            currentDestination,
+            onBackClick,
+            openDrawer,
         )
     }
 }
