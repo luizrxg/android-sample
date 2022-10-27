@@ -15,6 +15,8 @@ import com.wishes.database.dao.*
         WishEntity::class,
         LinkEntity::class,
         SaldoEntity::class,
+        SalarioEntity::class,
+        SalarioDepositadoEntity::class,
     ],
     version = 1, exportSchema = false
 )
@@ -23,6 +25,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun wishDao(): WishDao
     abstract fun linkDao(): LinkDao
     abstract fun saldoDao(): SaldoDao
+    abstract fun salarioDao(): SalarioDao
+    abstract fun salarioDepositadoDao(): SalarioDepositadoDao
 
     companion object {
 

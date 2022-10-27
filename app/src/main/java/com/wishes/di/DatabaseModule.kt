@@ -1,9 +1,7 @@
 package com.wishes.di
 
 import android.content.Context
-import com.wishes.database.dao.LinkDao
-import com.wishes.database.dao.SaldoDao
-import com.wishes.database.dao.WishDao
+import com.wishes.database.dao.*
 import com.wishes.database.db.AppDatabase
 import com.wishes.database.db.DatabaseTransactionRunner
 import com.wishes.database.db.RoomTransactionRunner
@@ -38,6 +36,16 @@ class DatabaseModule {
     @Provides
     fun provideSaldoDao(appDatabase: AppDatabase): SaldoDao {
         return appDatabase.saldoDao()
+    }
+
+    @Provides
+    fun provideSalarioDao(appDatabase: AppDatabase): SalarioDao {
+        return appDatabase.salarioDao()
+    }
+
+    @Provides
+    fun provideSalarioDepositadoDao(appDatabase: AppDatabase): SalarioDepositadoDao {
+        return appDatabase.salarioDepositadoDao()
     }
 }
 

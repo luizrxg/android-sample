@@ -25,31 +25,33 @@ fun TextField(
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: String? = null,
+    label: @Composable (() -> Unit)? = null,
     maxLength: Int? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    variant: String,
     modifier: Modifier = Modifier,
-){
+) {
     OutlinedTextField(
         value = value,
         onValueChange = {
             if (
-                if(maxLength != null){
+                if (maxLength != null) {
                     it.length < maxLength
                 } else true
             )
-            onValueChange(it)
+                onValueChange(it)
         },
         placeholder = {
             if (placeholder != null)
-            Text(
-                placeholder,
-                color = MaterialTheme.colors.secondary.copy(.2f)
-            )
+                Text(
+                    placeholder,
+                    color = MaterialTheme.colors.secondary.copy(.2f)
+                )
         },
+        label = label,
         modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp, 8.dp),
+            .fillMaxWidth(),
         textStyle = MaterialTheme.typography.body1,
         singleLine = true,
         shape = MaterialTheme.shapes.small,
@@ -57,12 +59,42 @@ fun TextField(
         keyboardActions = keyboardActions,
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            containerColor = MaterialTheme.colors.onBackground,
-            textColor = MaterialTheme.colors.secondary,
-            focusedBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent,
-            cursorColor = MaterialTheme.colors.secondary,
-        )
+        colors =
+        when (variant) {
+            "translucent" -> {
+                TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = MaterialTheme.colors.onBackground,
+                    textColor = MaterialTheme.colors.secondary,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    cursorColor = MaterialTheme.colors.secondary,
+                    focusedLabelColor = MaterialTheme.colors.secondary,
+                    unfocusedLabelColor = MaterialTheme.colors.secondary
+                )
+            }
+            "outlined" -> {
+                TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = Color.Transparent,
+                    textColor = MaterialTheme.colors.secondary,
+                    focusedBorderColor = MaterialTheme.colors.secondary,
+                    unfocusedBorderColor = MaterialTheme.colors.secondary,
+                    cursorColor = MaterialTheme.colors.secondary,
+                    focusedLabelColor = MaterialTheme.colors.secondary,
+                    unfocusedLabelColor = MaterialTheme.colors.secondary
+                )
+            }
+            "empty" -> {
+                TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = Color.Transparent,
+                    textColor = MaterialTheme.colors.secondary,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    cursorColor = MaterialTheme.colors.secondary,
+                )
+            }
+            else -> {
+                TextFieldDefaults.outlinedTextFieldColors()
+            }
+        }
     )
 }

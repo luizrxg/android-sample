@@ -18,10 +18,10 @@ class SaldoRepository @Inject constructor(
     }
 
     suspend fun atualizarSaldo(saldo: BigDecimal){
-        return saldoDao.atualizarSaldo(saldo)
+        saldoDao.atualizarSaldo(saldo)
     }
 
     suspend fun criarSaldo(saldo: SaldoEntity){
-        return saldoDao.criarSaldo(saldo)
+        saldoDao.criarSaldo(saldo)
     }
 }

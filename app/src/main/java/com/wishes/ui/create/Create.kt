@@ -1,5 +1,8 @@
 package com.wishes.ui.create
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -33,6 +36,8 @@ import com.wishes.ui.commons.components.*
 import com.wishes.ui.navigation.WishesNavigationDestination
 import com.wishes.util.checkHttps
 import com.wishes.util.isBigDecimal
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
@@ -73,6 +78,13 @@ fun CreateScreen(
     var link by remember { mutableStateOf("") }
     val links = remember { mutableStateListOf<String?>() }
     val uriHandler = LocalUriHandler.current
+    var slideUp by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    scope.launch {
+        delay(50)
+        slideUp = true
+    }
 
     fun setPreco(value: String){ preco = value }
 
@@ -108,182 +120,197 @@ fun CreateScreen(
             )
         },
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .topPadding()
-                .fillMaxSize()
-                .background(MaterialTheme.colors.background, RoundedCornerShape(5, 5, 0, 0))
+        AnimatedVisibility(
+            visible = slideUp,
+            enter = slideInVertically(initialOffsetY = { it / 2 }),
+            exit = slideOutVertically(targetOffsetY = { it })
         ) {
-            Box {
-                LazyColumn(
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.Top,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(bottom = 70.dp)
-                ){
-                    item {
-                        Text(
-                            "Nome",
-                            textAlign = TextAlign.Start,
-                            style = MaterialTheme.typography.body1,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, top = 16.dp)
-                        )
-                        TextField(
-                            nome,
-                            { nome = it },
-                            maxLength = 30
-                        )
-                        Text(
-                            "Preço",
-                            textAlign = TextAlign.Start,
-                            style = MaterialTheme.typography.body1,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, top = 6.dp)
-                        )
-                        TextField(
-                            preco,
-                            { isBigDecimal(it, ::setPreco) },
-                            leadingIcon = {
-                                Text(
-                                    "R$",
-                                    style = MaterialTheme.typography.body1,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colors.secondary
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .topPadding()
+                    .fillMaxSize()
+                    .background(
+                        MaterialTheme.colors.background,
+                        RoundedCornerShape(5, 5, 0, 0)
+                    )
+            ) {
+                Box {
+                    LazyColumn(
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.Top,
+                        modifier = Modifier
+                            .padding(bottom = 78.dp)
+                            .fillMaxSize()
+                    ){
+                        item {
+                            Text(
+                                "Nome",
+                                textAlign = TextAlign.Start,
+                                style = MaterialTheme.typography.body1,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, top = 16.dp)
+                            )
+                            TextField(
+                                nome,
+                                { nome = it },
+                                maxLength = 30,
+                                variant = "translucent",
+                                modifier = Modifier.padding(16.dp, 8.dp)
+                            )
+                            Text(
+                                "Preço",
+                                textAlign = TextAlign.Start,
+                                style = MaterialTheme.typography.body1,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, top = 6.dp)
+                            )
+                            TextField(
+                                preco,
+                                { isBigDecimal(it, ::setPreco) },
+                                leadingIcon = {
+                                    Text(
+                                        "R$",
+                                        style = MaterialTheme.typography.body1,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colors.secondary
+                                    )
+                                },
+                                maxLength = 30,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                variant = "translucent",
+                                modifier = Modifier.padding(16.dp, 8.dp)
+                            )
+                            Text(
+                                "Prioridade",
+                                textAlign = TextAlign.Start,
+                                style = MaterialTheme.typography.body1,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, top = 6.dp)
+                            )
+                            Row(
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(end = 16.dp)
+                            ) {
+                                RadioOption(
+                                    text = "Baixa",
+                                    selected = prioridade == 0,
+                                    onClick = { prioridade = 0 }
                                 )
-                            },
-                            maxLength = 30,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                        )
-                        Text(
-                            "Prioridade",
-                            textAlign = TextAlign.Start,
-                            style = MaterialTheme.typography.body1,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, top = 6.dp)
-                        )
-                        Row(
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(end = 16.dp)
-                        ) {
-                            RadioOption(
-                                text = "Baixa",
-                                selected = prioridade == 0,
-                                onClick = { prioridade = 0 }
+                                RadioOption(
+                                    text = "Média",
+                                    selected = prioridade == 1,
+                                    onClick = { prioridade = 1 }
+                                )
+                                RadioOption(
+                                    text = "Alta",
+                                    selected = prioridade == 2,
+                                    onClick = { prioridade = 2 }
+                                )
+                            }
+                            Text(
+                                "Links",
+                                textAlign = TextAlign.Start,
+                                style = MaterialTheme.typography.body1,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, top = 6.dp)
                             )
-                            RadioOption(
-                                text = "Média",
-                                selected = prioridade == 1,
-                                onClick = { prioridade = 1 }
-                            )
-                            RadioOption(
-                                text = "Alta",
-                                selected = prioridade == 2,
-                                onClick = { prioridade = 2 }
+                            TextField(
+                                link,
+                                { link = it },
+                                trailingIcon = {
+                                    IconButton(
+                                        onClick = { addLink() }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Add,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colors.secondary,
+                                        )
+                                    }
+                                },
+                                keyboardActions = KeyboardActions(
+                                    onDone = { addLink() }
+                                ),
+                                variant = "translucent",
+                                modifier = Modifier.padding(16.dp, 8.dp)
                             )
                         }
-                        Text(
-                            "Links",
-                            textAlign = TextAlign.Start,
-                            style = MaterialTheme.typography.body1,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, top = 6.dp)
-                        )
-                        TextField(
-                            link,
-                            { link = it },
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = { addLink() }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Add,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colors.secondary,
-                                    )
-                                }
-                            },
-                            keyboardActions = KeyboardActions(
-                                onDone = { addLink() }
-                            )
-                        )
-                    }
-                    itemsIndexed(links){ index, link ->
-                        link?.let {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(16.dp, 0.dp)
-                            ){
+                        itemsIndexed(links){ index, link ->
+                            link?.let {
                                 Row(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxWidth(.9f)
-                                        .padding(0.dp, 4.dp)
-                                        .background(
-                                            MaterialTheme.colors.onBackground,
-                                            MaterialTheme.shapes.small
-                                        )
-                                        .clip(MaterialTheme.shapes.small)
-                                        .clickable { uriHandler.openUri(checkHttps(link)) }
-                                        .padding(16.dp, 12.dp, 12.dp, 12.dp)
+                                    modifier = Modifier.padding(16.dp, 0.dp)
                                 ){
-                                    Text(
-                                        link,
-                                        textAlign = TextAlign.Start,
-                                        style = MaterialTheme.typography.body1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        maxLines = 1,
-                                        modifier = Modifier.widthIn(max = 150.dp)
-                                    )
-                                    Icon(
-                                        imageVector = Icons.Rounded.OpenInNew,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colors.secondary,
-                                        modifier = Modifier.requiredSize(24.dp)
-                                    )
-                                }
-                                IconButton(
-                                    onClick = { links.removeAt(index) },
-                                    modifier = Modifier.padding(start = 8.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Remove,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colors.secondary,
+                                    Row(
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically,
                                         modifier = Modifier
-                                            .requiredSize(32.dp)
-                                    )
+                                            .fillMaxWidth(.9f)
+                                            .padding(0.dp, 4.dp)
+                                            .background(
+                                                MaterialTheme.colors.onBackground,
+                                                MaterialTheme.shapes.small
+                                            )
+                                            .clip(MaterialTheme.shapes.small)
+                                            .clickable { uriHandler.openUri(checkHttps(link)) }
+                                            .padding(16.dp, 12.dp, 12.dp, 12.dp)
+                                    ){
+                                        Text(
+                                            link,
+                                            textAlign = TextAlign.Start,
+                                            style = MaterialTheme.typography.body1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            maxLines = 1,
+                                            modifier = Modifier.widthIn(max = 150.dp)
+                                        )
+                                        Icon(
+                                            imageVector = Icons.Rounded.OpenInNew,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colors.secondary,
+                                            modifier = Modifier.requiredSize(24.dp)
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { links.removeAt(index) },
+                                        modifier = Modifier.padding(start = 8.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Remove,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colors.secondary,
+                                            modifier = Modifier
+                                                .requiredSize(32.dp)
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .background(MaterialTheme.colors.background)
-                ){
-                    Button(
-                        text = "CRIAR",
-                        onClick = { create() },
-                        variant = "filled",
+                    Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .requiredHeight(48.dp)
-                    )
+                            .align(Alignment.BottomCenter)
+                            .background(MaterialTheme.colors.background)
+                    ){
+                        Button(
+                            text = "CRIAR",
+                            onClick = { create() },
+                            variant = "filled",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .requiredHeight(48.dp)
+                        )
+                    }
                 }
             }
         }

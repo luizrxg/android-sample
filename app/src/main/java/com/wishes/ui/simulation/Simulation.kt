@@ -1,5 +1,8 @@
 package com.wishes.ui.simulation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,12 +31,15 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.wishes.R
 import com.wishes.data.model.Wish
+import com.wishes.ui.commons.components.SearchBar
 import com.wishes.ui.commons.components.TopBar
 import com.wishes.ui.commons.components.Wish
 import com.wishes.ui.commons.components.topPadding
 import com.wishes.ui.navigation.WishesNavigationDestination
 import com.wishes.util.formatDotToPeriod
 import com.wishes.util.formatToFixed2
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
@@ -61,6 +67,7 @@ fun SimulationRoute(
         viewModel::unselectWish,
         uiState.value.total,
         uiState.value.resto,
+        viewModel::setSearch
     )
 }
 
@@ -78,9 +85,18 @@ fun SimulationScreen(
     unselectWish: (Wish) -> Unit,
     total: BigDecimal? = BigDecimal.ZERO,
     resto: BigDecimal? = BigDecimal.ZERO,
+    setSearch: (String) -> Unit,
 ) {
+    var search by remember { mutableStateOf("") }
+    var slideUp by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
-    fun handleSelect(wish: Wish){
+    scope.launch {
+        delay(50)
+        slideUp = true
+    }
+
+    fun handleSelect(wish: Wish) {
         if (selectedWishes.contains(wish))
             unselectWish(wish)
         else
@@ -97,137 +113,158 @@ fun SimulationScreen(
             )
         },
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .topPadding()
-                .fillMaxSize()
-                .background(MaterialTheme.colors.background, RoundedCornerShape(5, 5, 0, 0))
+        AnimatedVisibility(
+            visible = slideUp,
+            enter = slideInVertically(initialOffsetY = { it / 2 }),
+            exit = slideOutVertically(targetOffsetY = { it })
         ) {
-            LazyColumn(
+            Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
+                    .topPadding()
                     .fillMaxSize()
+                    .background(MaterialTheme.colors.background, RoundedCornerShape(5, 5, 0, 0))
             ) {
-                item{
-                    Text(
-                        "Selecione os itens",
-                        textAlign = TextAlign.Start,
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp, 16.dp, 0.dp, 6.dp)
-                    )
-                }
-                items(wishes) { obj ->
-                    obj?.let {
-                        if (!obj.comprado){
-                            Wish(
-                                obj,
-                                { handleSelect(obj) },
-                                selectedWishes.contains(obj)
-                            )
+                LazyColumn(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    item {
+                        Text(
+                            "Selecione os itens",
+                            textAlign = TextAlign.Start,
+                            style = MaterialTheme.typography.body1,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp, 16.dp, 0.dp, 0.dp)
+                        )
+                        SearchBar(
+                            value = search,
+                            onValueChange = {
+                                setSearch(it)
+                                search = it
+                            },
+                            onClear = {
+                                setSearch("")
+                                search = ""
+                            },
+                            placeholder = "Pesquisar...",
+                            variant = "empty",
+                            modifier = Modifier
+                                .padding(8.dp, 0.dp, 8.dp, 8.dp)
+                        )
+                    }
+                    items(wishes) { obj ->
+                        obj?.let {
+                            if (!obj.comprado) {
+                                Wish(
+                                    obj,
+                                    { handleSelect(obj) },
+                                    selectedWishes.contains(obj)
+                                )
+                            }
                         }
                     }
-                }
-                item {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .background(MaterialTheme.colors.background)
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ){
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ){
-                            Text(
-                                formatDotToPeriod("Saldo"),
-                                color = MaterialTheme.colors.secondary,
-                                fontSize = 16.sp,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                modifier = Modifier.padding()
-                            )
-                            Text(
-                                formatDotToPeriod("R$ ${formatToFixed2(saldo ?: BigDecimal.ZERO)}"),
-                                color = MaterialTheme.colors.secondary,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 18.sp,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                modifier = Modifier.padding()
-                            )
-                        }
-                        Divider(
+                    item {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceBetween,
                             modifier = Modifier
+                                .background(MaterialTheme.colors.background)
                                 .fillMaxWidth()
-                                .padding(0.dp, 8.dp)
-                                .clip(RoundedCornerShape(100)),
-                            2.dp,
-                            MaterialTheme.colors.onBackground,
-                        )
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ){
-                            Text(
-                                formatDotToPeriod("Total"),
-                                color = MaterialTheme.colors.secondary,
-                                fontSize = 16.sp,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                modifier = Modifier.padding()
+                                .padding(16.dp)
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    formatDotToPeriod("Saldo"),
+                                    color = MaterialTheme.colors.secondary,
+                                    fontSize = 16.sp,
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 1,
+                                    modifier = Modifier.padding()
+                                )
+                                Text(
+                                    formatDotToPeriod("R$ ${formatToFixed2(saldo ?: BigDecimal.ZERO)}"),
+                                    color = MaterialTheme.colors.secondary,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 18.sp,
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 1,
+                                    modifier = Modifier.padding()
+                                )
+                            }
+                            Divider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(0.dp, 8.dp)
+                                    .clip(RoundedCornerShape(100)),
+                                2.dp,
+                                MaterialTheme.colors.onBackground,
                             )
-                            Text(
-                                formatDotToPeriod("R$ ${formatToFixed2(total ?: BigDecimal.ZERO)}"),
-                                color = MaterialTheme.colors.secondary,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 18.sp,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                modifier = Modifier.padding()
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    formatDotToPeriod("Total"),
+                                    color = MaterialTheme.colors.secondary,
+                                    fontSize = 16.sp,
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 1,
+                                    modifier = Modifier.padding()
+                                )
+                                Text(
+                                    formatDotToPeriod("R$ ${formatToFixed2(total ?: BigDecimal.ZERO)}"),
+                                    color = MaterialTheme.colors.secondary,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 18.sp,
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 1,
+                                    modifier = Modifier.padding()
+                                )
+                            }
+                            Divider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(0.dp, 8.dp)
+                                    .clip(RoundedCornerShape(100)),
+                                2.dp,
+                                MaterialTheme.colors.onBackground,
                             )
-                        }
-                        Divider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(0.dp, 8.dp)
-                                .clip(RoundedCornerShape(100)),
-                            2.dp,
-                            MaterialTheme.colors.onBackground,
-                        )
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ){
-                            Text(
-                                formatDotToPeriod("Resto"),
-                                color = MaterialTheme.colors.secondary,
-                                fontSize = 16.sp,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                modifier = Modifier.padding()
-                            )
-                            Text(
-                                formatDotToPeriod("R$ ${formatToFixed2(resto ?: BigDecimal.ZERO)}"),
-                                color =
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    formatDotToPeriod("Resto"),
+                                    color = MaterialTheme.colors.secondary,
+                                    fontSize = 16.sp,
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 1,
+                                    modifier = Modifier.padding()
+                                )
+                                Text(
+                                    formatDotToPeriod("R$ ${formatToFixed2(resto ?: BigDecimal.ZERO)}"),
+                                    color =
                                     if ((resto ?: BigDecimal.ZERO) > BigDecimal.ZERO)
                                         MaterialTheme.colors.secondary
                                     else
                                         colorResource(R.color.red),
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 18.sp,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                modifier = Modifier.padding()
-                            )
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 18.sp,
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 1,
+                                    modifier = Modifier.padding()
+                                )
+                            }
                         }
                     }
                 }

@@ -5,12 +5,16 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.wishes.data.domain.BuscarWishes
+import com.wishes.data.repository.SalarioDepositadoRepository
+import com.wishes.data.repository.SalarioRepository
 import com.wishes.data.repository.SaldoRepository
 import com.wishes.data.repository.WishRepository
+import com.wishes.database.entity.SalarioDepositadoEntity
 import com.wishes.database.entity.SaldoEntity
 import com.wishes.database.entity.WishEntity
 import com.wishes.ui.commons.UiMessage
 import com.wishes.ui.commons.UiMessageManager
+import com.wishes.util.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -22,6 +26,8 @@ import javax.inject.Inject
 class HomeViewModel  @Inject internal constructor(
     private val wishRepository: WishRepository,
     private val saldoRepository: SaldoRepository,
+    private val salarioRepository: SalarioRepository,
+    private val salarioDepositadoRepository: SalarioDepositadoRepository,
     private val buscarWishes: BuscarWishes
 ) : ViewModel() {
 
@@ -32,6 +38,18 @@ class HomeViewModel  @Inject internal constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = BigDecimal.ZERO
     )
+
+    private val salario = saldoRepository.buscarSaldo()
+
+    val stateSalario: StateFlow<BigDecimal?> = salario.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = BigDecimal.ZERO
+    )
+
+    private val search = MutableStateFlow("")
+
+    fun setSearch(value: String){ search.value = value }
 
     fun criarSaldo(saldo: SaldoEntity){
         viewModelScope.launch {
@@ -101,9 +119,43 @@ class HomeViewModel  @Inject internal constructor(
 
     val pagingWishes = buscarWishes.flow.cachedIn(viewModelScope)
 
+    fun atualizarSalario(
+        value: BigDecimal,
+        data: Int
+    ) {
+        viewModelScope.launch {
+            salarioRepository.atualizarSalario(value, data)
+        }
+    }
+
     init {
         viewModelScope.launch {
-            buscarWishes(BuscarWishes.Params(pagConfig))
+            val salario = salarioRepository.buscarSalario()
+            if (salario != null){
+                val depositouEsteMes = salarioDepositadoRepository.depositouEsteMes()
+
+                if (!depositouEsteMes && hasMonthDayPassed(salario.data)){
+                    adicionarSaldo(salario.valor)
+                    salarioDepositadoRepository.depositarSalario(SalarioDepositadoEntity(0, getYearMonth()))
+                }
+
+                val salariosDepositados = salarioDepositadoRepository.buscarSalariosDepositados(salario.dataCriacao)
+
+                val mesesDepositar = getMonthsBetween(salario.dataCriacao, getYearMonth()) - salariosDepositados.size
+                repeat(
+                    if (getTodayOfMonth() >= salario.data) mesesDepositar
+                    else if (mesesDepositar > 0) mesesDepositar - 1
+                    else 0
+                ){
+                    adicionarSaldo(salario.valor)
+                    salarioDepositadoRepository.depositarSalario(SalarioDepositadoEntity(0, getYearMonth()))
+                }
+            }
+            search
+                .debounce(300)
+                .onEach { buscarWishes(BuscarWishes.Params(pagConfig, it)) }
+                .catch {  }
+                .collect()
         }
     }
 }

@@ -15,6 +15,9 @@ abstract class WishDao : EntityDao<WishEntity>() {
     @Query("SELECT * from wishes ORDER BY data DESC")
     abstract fun buscarWishes(): PagingSource<Int, WishEntity>
 
+    @Query("SELECT * from wishes WHERE nome LIKE :search ORDER BY data DESC")
+    abstract fun buscarWishes(search: String): PagingSource<Int, WishEntity>
+
     @Query("SELECT * from wishes WHERE data BETWEEN :primeiroDia AND :ultimoDia ORDER BY data DESC")
     abstract fun buscarWishesUltimoMes(primeiroDia: String, ultimoDia: String): PagingSource<Int, WishEntity>
 

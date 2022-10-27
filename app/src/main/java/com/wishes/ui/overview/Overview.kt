@@ -1,5 +1,8 @@
 package com.wishes.ui.overview
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -31,10 +34,10 @@ import com.wishes.data.model.Wish
 import com.wishes.database.entity.LinkEntity
 import com.wishes.ui.commons.components.*
 import com.wishes.ui.navigation.WishesNavigationDestination
-import com.wishes.ui.overview.ComprarUiState
-import com.wishes.ui.overview.OverviewViewModel
 import com.wishes.util.checkHttps
 import com.wishes.util.formatDotToPeriod
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -87,6 +90,13 @@ fun OverviewScreen(
     var link by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
     val uriHandler = LocalUriHandler.current
+    var slideUp by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    scope.launch {
+        delay(50)
+        slideUp = true
+    }
 
     comprarState.message?.let { message ->
         LaunchedEffect(message) {
@@ -163,176 +173,187 @@ fun OverviewScreen(
         }
     ) {
         wish?.let {
-            Box{
-                LazyColumn(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top,
-                    modifier = Modifier
-                        .topPadding()
-                        .fillMaxSize()
-                        .padding(bottom = 70.dp)
-                        .background(MaterialTheme.colors.background, RoundedCornerShape(5, 5, 0, 0))
-                ) {
-                    item{
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth()
-                        ) {
-                            Text(
-                                formatDotToPeriod("R$ ${wish.preco}"),
-                                color = MaterialTheme.colors.secondary,
-                                textAlign = TextAlign.Start,
-                                style = MaterialTheme.typography.h6,
-                                fontWeight = FontWeight.SemiBold,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                modifier = Modifier.widthIn(max = 150.dp)
+            AnimatedVisibility(
+                visible = slideUp,
+                enter = slideInVertically(initialOffsetY = { it / 2 }),
+                exit = slideOutVertically(targetOffsetY = { it })
+            ) {
+                Box{
+                    LazyColumn(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top,
+                        modifier = Modifier
+                            .topPadding()
+                            .fillMaxSize()
+                            .padding(bottom = if (!wish.comprado) 78.dp else 0.dp)
+                            .background(
+                                MaterialTheme.colors.background,
+                                RoundedCornerShape(5, 5, 0, 0)
                             )
-                            Priority(
-                                level = wish.prioridade,
-                                modifier = Modifier
-                                    .requiredSize(38.dp)
-                                    .padding(8.dp)
-                            )
-                        }
-                        Divider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp, 0.dp)
-                                .clip(RoundedCornerShape(100)),
-                            2.dp,
-                            MaterialTheme.colors.onBackground,
-                        )
-                        Text(
-                            "Links",
-                            textAlign = TextAlign.Start,
-                            style = MaterialTheme.typography.body1,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, top = 6.dp)
-                        )
-
-                        if (comprarExpanded)
-                            Dialog(
-                                title = "Deseja marcar como comprado ?",
-                                cancelText = "Voltar",
-                                confirmText = "Confirmar",
-                                confirmAction = {
-                                    comprar()
-                                    onBackClick()
-                                },
-                                onDismiss = { comprarExpanded = false }
-                            )
-
-                        if (deleteExpanded)
-                            Dialog(
-                                title = "Deseja deletar este item ?",
-                                cancelText = "Cancelar",
-                                confirmText = "Deletar",
-                                confirmAction = {
-                                    delete()
-                                    onBackClick()
-                                },
-                                onDismiss = { deleteExpanded = false }
-                            )
-                        TextField(
-                            link,
-                            { link = it },
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = { addLink() }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Add,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colors.secondary,
-                                    )
-                                }
-                            },
-                            keyboardActions = KeyboardActions(
-                                onDone = { addLink() }
-                            )
-                        )
-                    }
-                    items(links){ link ->
-                        link?.let {
+                    ) {
+                        item{
                             Row(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(16.dp, 0.dp)
-                            ){
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth()
+                            ) {
+                                Text(
+                                    formatDotToPeriod("R$ ${wish.preco}"),
+                                    color = MaterialTheme.colors.secondary,
+                                    textAlign = TextAlign.Start,
+                                    style = MaterialTheme.typography.h6,
+                                    fontWeight = FontWeight.SemiBold,
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 1,
+                                    modifier = Modifier.widthIn(max = 150.dp)
+                                )
+                                Priority(
+                                    level = wish.prioridade,
+                                    modifier = Modifier
+                                        .requiredSize(38.dp)
+                                        .padding(8.dp)
+                                )
+                            }
+                            Divider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp, 0.dp)
+                                    .clip(RoundedCornerShape(100)),
+                                2.dp,
+                                MaterialTheme.colors.onBackground,
+                            )
+                            Text(
+                                "Links",
+                                textAlign = TextAlign.Start,
+                                style = MaterialTheme.typography.body1,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, top = 6.dp)
+                            )
+
+                            if (comprarExpanded)
+                                Dialog(
+                                    title = "Deseja marcar como comprado ?",
+                                    cancelText = "Voltar",
+                                    confirmText = "Confirmar",
+                                    confirmAction = {
+                                        comprar()
+                                        onBackClick()
+                                    },
+                                    onDismiss = { comprarExpanded = false }
+                                )
+
+                            if (deleteExpanded)
+                                Dialog(
+                                    title = "Deseja deletar este item ?",
+                                    cancelText = "Cancelar",
+                                    confirmText = "Deletar",
+                                    confirmAction = {
+                                        delete()
+                                        onBackClick()
+                                    },
+                                    onDismiss = { deleteExpanded = false }
+                                )
+                            TextField(
+                                link,
+                                { link = it },
+                                trailingIcon = {
+                                    IconButton(
+                                        onClick = { addLink() }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Add,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colors.secondary,
+                                        )
+                                    }
+                                },
+                                keyboardActions = KeyboardActions(
+                                    onDone = { addLink() }
+                                ),
+                                variant = "translucent",
+                                modifier = Modifier.padding(16.dp, 8.dp)
+                            )
+                        }
+                        items(links){ link ->
+                            link?.let {
                                 Row(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxWidth(.9f)
-                                        .padding(0.dp, 4.dp)
-                                        .background(
-                                            MaterialTheme.colors.onBackground,
-                                            MaterialTheme.shapes.small
-                                        )
-                                        .clip(MaterialTheme.shapes.small)
-                                        .clickable { uriHandler.openUri(checkHttps(link.link)) }
-                                        .padding(16.dp, 12.dp, 12.dp, 12.dp)
+                                    modifier = Modifier.padding(16.dp, 0.dp)
                                 ){
-                                    Text(
-                                        link.link,
-                                        textAlign = TextAlign.Start,
-                                        style = MaterialTheme.typography.body1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        maxLines = 1,
-                                        modifier = Modifier.widthIn(max = 150.dp)
-                                    )
-                                    Icon(
-                                        imageVector = Icons.Rounded.OpenInNew,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colors.secondary,
-                                        modifier = Modifier.requiredSize(24.dp)
-                                    )
-                                }
-                                IconButton(
-                                    onClick = {
-                                        deleteLink(
-                                            LinkEntity(
-                                                link.id,
-                                                link.id_wish,
-                                                link.link
-                                            )
-                                        )
-                                    },
-                                    modifier = Modifier.padding(start = 8.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Remove,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colors.secondary,
+                                    Row(
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically,
                                         modifier = Modifier
-                                            .requiredSize(32.dp)
-                                    )
+                                            .fillMaxWidth(.9f)
+                                            .padding(0.dp, 4.dp)
+                                            .background(
+                                                MaterialTheme.colors.onBackground,
+                                                MaterialTheme.shapes.small
+                                            )
+                                            .clip(MaterialTheme.shapes.small)
+                                            .clickable { uriHandler.openUri(checkHttps(link.link)) }
+                                            .padding(16.dp, 12.dp, 12.dp, 12.dp)
+                                    ){
+                                        Text(
+                                            link.link,
+                                            textAlign = TextAlign.Start,
+                                            style = MaterialTheme.typography.body1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            maxLines = 1,
+                                            modifier = Modifier.widthIn(max = 150.dp)
+                                        )
+                                        Icon(
+                                            imageVector = Icons.Rounded.OpenInNew,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colors.secondary,
+                                            modifier = Modifier.requiredSize(24.dp)
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = {
+                                            deleteLink(
+                                                LinkEntity(
+                                                    link.id,
+                                                    link.id_wish,
+                                                    link.link
+                                                )
+                                            )
+                                        },
+                                        modifier = Modifier.padding(start = 8.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Remove,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colors.secondary,
+                                            modifier = Modifier
+                                                .requiredSize(32.dp)
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                if (!wish.comprado)
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .background(MaterialTheme.colors.background)
-                    ){
-                        Button(
-                            text = "COMPRAR" ,
-                            onClick = { comprarExpanded = true },
-                            variant = "filled",
+                    if (!wish.comprado)
+                        Row(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                                .requiredHeight(48.dp)
-                        )
-                    }
+                                .align(Alignment.BottomCenter)
+                                .background(MaterialTheme.colors.background)
+                        ){
+                            Button(
+                                text = "COMPRAR" ,
+                                onClick = { comprarExpanded = true },
+                                variant = "filled",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .requiredHeight(48.dp)
+                            )
+                        }
+                }
             }
         }
     }

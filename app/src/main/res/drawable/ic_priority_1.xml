@@ -10,10 +10,10 @@
   />
   <path
       android:pathData="M12,9.1L12,9.1A1.9,1.9 0,0 1,13.9 11L13.9,18A1.9,1.9 0,0 1,12 19.9L12,19.9A1.9,1.9 0,0 1,10.1 18L10.1,11A1.9,1.9 0,0 1,12 9.1z"
-      android:fillColor="@color/white"
+      android:fillColor="@color/priority1"
 />
   <path
       android:pathData="M19,5.1L19,5.1A1.9,1.9 0,0 1,20.9 7L20.9,18A1.9,1.9 0,0 1,19 19.9L19,19.9A1.9,1.9 0,0 1,17.1 18L17.1,7A1.9,1.9 0,0 1,19 5.1z"
-      android:fillColor="@color/white"
+      android:fillColor="@color/priority1"
 />
 </vector>

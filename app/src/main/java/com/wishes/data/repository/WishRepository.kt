@@ -27,6 +27,10 @@ class WishRepository @Inject constructor(
         return wishDao.buscarWishes()
     }
 
+    fun buscarWishes(search: String): PagingSource<Int, WishEntity> {
+        return wishDao.buscarWishes(search)
+    }
+
     fun buscarWishesUltimoMes(): PagingSource<Int, WishEntity> {
         return wishDao.buscarWishesUltimoMes(monthStart, monthEnd)
     }

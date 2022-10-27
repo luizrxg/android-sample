@@ -57,19 +57,33 @@ class SimulationViewModel @Inject internal constructor(
             initialValue = UiState.Empty
         )
 
-
-
     private val pagConfig = PagingConfig(20)
+
+    private val search = MutableStateFlow("")
+
+    fun setSearch(value: String){ search.value = value }
 
     val pagingWishes = buscarWishes.flow.cachedIn(viewModelScope)
 
     init {
         viewModelScope.launch {
+            search
+                .debounce(300)
+                .catch{ }
+                .onEach {
+                    buscarWishes(BuscarWishes.Params(pagConfig, search.value))
+                    total.value = BigDecimal.ZERO
+                    selectedWishes.value.map {
+                        total.value += it.preco
+                    }
+                    resto.value = stateSaldo.value?.minus(total.value) ?: BigDecimal.ZERO
+                }
+                .collect()
             selectedWishes
                 .debounce(300)
                 .catch{ }
                 .onEach {
-                    buscarWishes(BuscarWishes.Params(pagConfig))
+                    buscarWishes(BuscarWishes.Params(pagConfig, search.value))
                     total.value = BigDecimal.ZERO
                     selectedWishes.value.map {
                         total.value += it.preco

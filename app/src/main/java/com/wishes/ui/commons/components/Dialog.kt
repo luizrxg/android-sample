@@ -23,6 +23,8 @@ fun Dialog(
     confirmText: String,
     confirmAction: () -> Unit,
     onDismiss: () -> Unit,
+    enabled: Boolean = true,
+    content: @Composable (() -> Unit)? = null,
 ){
     Dialog(
         onDismissRequest = { onDismiss() }
@@ -39,6 +41,9 @@ fun Dialog(
                 style = MaterialTheme.typography.h6,
                 textAlign = TextAlign.Center
             )
+            if(content != null){
+                content()
+            }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -55,8 +60,10 @@ fun Dialog(
                 Button(
                     text = confirmText,
                     onClick = {
-                        confirmAction()
-                        onDismiss()
+                        if (enabled){
+                            confirmAction()
+                            onDismiss()
+                        }
                     },
                     variant = "filled",
                     modifier = Modifier
@@ -78,6 +85,7 @@ fun Dialog(
     confirmText: String,
     confirmAction: () -> Unit,
     onDismiss: () -> Unit,
+    enabled: Boolean = true
 ){
     Dialog(
         onDismissRequest = { onDismiss() }
@@ -98,7 +106,9 @@ fun Dialog(
                 value = value,
                 onValueChange = { onValueChange(it) },
                 maxLength = maxLength,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                variant = "translucent",
+                modifier = Modifier.padding(16.dp, 8.dp)
             )
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -117,10 +127,13 @@ fun Dialog(
                 Button(
                     text = confirmText,
                     onClick = {
-                        confirmAction()
-                        onDismiss()
+                        if (enabled){
+                            confirmAction()
+                            onDismiss()
+                        }
                     },
                     variant = "filled",
+                    enabled = enabled,
                     modifier = Modifier
                         .weight(.5f)
                         .requiredHeight(56.dp)

@@ -16,13 +16,13 @@ class BuscarWishes @Inject constructor(
     private val wishRepository: WishRepository
 ) : PagingInteractor<BuscarWishes.Params, Wish>() {
 
-    data class Params(override val pagingConfig: PagingConfig) :
+    data class Params(override val pagingConfig: PagingConfig, val search: String = "") :
         Parameters<Wish>
 
     override suspend fun createObservable(
         params: Params
     ): Flow<PagingData<Wish>> = Pager(config = params.pagingConfig) {
-        wishRepository.buscarWishes()
+        wishRepository.buscarWishes(if(params.search.isEmpty())"%" else "%${params.search}%")
     }.flow.map { it.map(WishEntity::asExternalModel) }
 
 }

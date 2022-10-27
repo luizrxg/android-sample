@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
@@ -12,11 +13,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,18 +32,15 @@ import androidx.paging.compose.items
 import com.wishes.R
 import com.wishes.data.model.Wish
 import com.wishes.database.entity.SaldoEntity
-import com.wishes.ui.commons.components.Button
-import com.wishes.ui.commons.components.Dialog
-import com.wishes.ui.commons.components.SwipeDismissSnackbarHost
-import com.wishes.ui.commons.components.Wish
+import com.wishes.ui.commons.components.*
 import com.wishes.ui.create.CreateDestination
 import com.wishes.ui.navigation.WishesNavigationDestination
 import com.wishes.ui.receipt.ReceiptDestination
-import com.wishes.ui.receipt.ReceiptViewModel
 import com.wishes.ui.simulation.SimulationDestination
 import com.wishes.util.formatDotToPeriod
 import com.wishes.util.isBigDecimal
 import java.math.BigDecimal
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -55,6 +54,7 @@ fun HomeRoute(
 ) {
     val wishes = viewModel.pagingWishes.collectAsLazyPagingItems()
     val saldo = viewModel.stateSaldo.collectAsStateWithLifecycle()
+    val salario = viewModel.stateSalario.collectAsStateWithLifecycle()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(
@@ -64,11 +64,14 @@ fun HomeRoute(
         onNavigateToOverview,
         wishes,
         saldo.value,
+        salario.value,
         viewModel::adicionarSaldo,
         viewModel::subtrairSaldo,
         viewModel::criarSaldo,
+        viewModel::atualizarSalario,
         viewModel::clearMessage,
-        uiState.value
+        viewModel::setSearch,
+        uiState.value,
     )
 }
 
@@ -82,17 +85,23 @@ fun HomeScreen(
     onNavigateToOverview: (Long) -> Unit,
     wishes: LazyPagingItems<Wish>,
     saldo: BigDecimal? = BigDecimal.ZERO,
+    salario: BigDecimal? = BigDecimal.ZERO,
     adicionarSaldo: (saldo: BigDecimal) -> Unit,
     subtrairSaldo: (saldo: BigDecimal) -> Unit,
     criarSaldo: (saldo: SaldoEntity) -> Unit,
+    atualizarSalario: (value: BigDecimal, data: Int) -> Unit,
     deleteMessage: () -> Unit,
+    setSearch: (value: String) -> Unit,
     uiState: UiState
 ) {
-    var expanded by remember { mutableStateOf(false) }
     var adicionarExpanded by remember { mutableStateOf(false) }
     var subtrairExpanded by remember { mutableStateOf(false) }
+    var salarioExpanded by remember { mutableStateOf(false) }
     var showSaldo by remember { mutableStateOf(true) }
     var novoSaldo by remember { mutableStateOf("0") }
+    var novoSalario by remember { mutableStateOf("") }
+    var data by remember { mutableStateOf("") }
+    var search by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
 
     fun setNovoSaldo(value: String) { novoSaldo = value }
@@ -177,6 +186,41 @@ fun HomeScreen(
                             },
                             onDismiss = { subtrairExpanded = false }
                         )
+                    if (salarioExpanded)
+                        Dialog(
+                            title = "Configurar salario",
+                            cancelText = "Voltar",
+                            confirmText = "Confirmar",
+                            confirmAction = {
+                                atualizarSalario(novoSalario.toBigDecimal(), data.toInt())
+                                novoSalario = ""
+                                data = ""
+                            },
+                            onDismiss = { salarioExpanded = false },
+                            enabled = novoSalario.isNotEmpty() || data.isNotEmpty()
+                        ){
+                            Column(
+                                modifier = Modifier.padding(0.dp, 4.dp, 0.dp, 8.dp)
+                            ){
+                                TextField(
+                                    value = novoSalario,
+                                    onValueChange = { isBigDecimal(it, { novoSalario = it }) },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    label = { Text("Valor") },
+                                    variant = "translucent",
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
+                                TextField(
+                                    value = data,
+                                    onValueChange = { isBigDecimal(it, { data = it }) },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    maxLength = 3,
+                                    label = { Text("Dia do mês") },
+                                    variant = "translucent",
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
+                            }
+                        }
                     Divider(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -294,10 +338,10 @@ fun HomeScreen(
                             )
                             Button(
                                 text = "Configurar salário",
-                                onClick = {  },
+                                onClick = { salarioExpanded = !salarioExpanded },
                                 variant = "translucent",
                                 box = true,
-                                imageVectorIcon = Icons.Rounded.List,
+                                painterIcon = painterResource(R.drawable.ic_cash_wage),
                                 modifier = Modifier.padding(start = 8.dp, end = 16.dp)
                             )
                         }
@@ -305,16 +349,33 @@ fun HomeScreen(
                 }
                 Row(
                     modifier = Modifier
-                        .requiredHeight(16.dp)
                         .fillMaxWidth()
                         .background(MaterialTheme.colors.primary)
                 ){
-                    Box(
+                    Row(
                         modifier = Modifier
-                            .requiredHeight(16.dp)
                             .fillMaxWidth()
-                            .background(MaterialTheme.colors.background, RoundedCornerShape(80, 80, 0, 0))
-                    )
+                            .background(
+                                MaterialTheme.colors.background,
+                                RoundedCornerShape(25, 25, 0, 0)
+                            )
+                    ){
+                        SearchBar(
+                            value = search,
+                            onValueChange = {
+                                setSearch(it)
+                                search = it
+                            },
+                            onClear = {
+                                setSearch("")
+                                search = ""
+                            },
+                            placeholder = "Pesquisar...",
+                            variant = "empty",
+                            modifier = Modifier
+                                .padding(16.dp, 8.dp)
+                        )
+                    }
                 }
             }
             items(wishes) { obj ->

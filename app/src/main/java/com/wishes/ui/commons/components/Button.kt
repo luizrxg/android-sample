@@ -36,7 +36,7 @@ fun Button(
     box: Boolean? = false,
     painterIcon: Painter? = null,
     imageVectorIcon: ImageVector? = null,
-    enabled: Boolean? = true,
+    enabled: Boolean = true,
     customColor: Color? = null,
     modifier: Modifier = Modifier,
 ){
@@ -51,8 +51,14 @@ fun Button(
                 .clip(MaterialTheme.shapes.small)
                 .clickable { onClick() }
                 .background(
-                    when (variant){
-                        "filled" -> { MaterialTheme.colors.primary }
+                    when (variant) {
+                        "filled" -> {
+                            if (enabled){
+                                MaterialTheme.colors.primary
+                            } else {
+                                MaterialTheme.colors.onBackground
+                            }
+                        }
                         "translucent" -> { Color.Black.copy(.2f) }
                         "contained" -> { Color.Transparent }
                         "text-white" -> { Color.Transparent }
@@ -97,11 +103,11 @@ fun Button(
         }
     } else {
         Button(
-            onClick = { onClick() },
+            onClick = { if (enabled) onClick() },
             colors =
             when (variant){
                 "filled" -> {
-                    if (enabled!!){
+                    if (enabled){
                         ButtonDefaults.buttonColors(
                             containerColor = color,
                             contentColor = MaterialTheme.colors.secondary,
@@ -114,20 +120,20 @@ fun Button(
                     }
                 }
                 "translucent" -> {
-                    if (enabled!!){
+                    if (enabled){
                         ButtonDefaults.buttonColors(
                             containerColor = Color.Black.copy(.2f),
                             contentColor = MaterialTheme.colors.secondary,
                         )
                     } else {
                         ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colors.secondary,
+                            containerColor = Color.Black.copy(.2f),
                             contentColor = MaterialTheme.colors.onBackground,
                         )
                     }
                 }
                 "contained" -> {
-                    if (enabled!!){
+                    if (enabled){
                         ButtonDefaults.buttonColors(
                             containerColor = Color.Transparent,
                             contentColor = color,
@@ -140,7 +146,7 @@ fun Button(
                     }
                 }
                 "text-white" -> {
-                    if (enabled!!){
+                    if (enabled){
                         ButtonDefaults.buttonColors(
                             containerColor = Color.Transparent,
                             contentColor = MaterialTheme.colors.secondary,
@@ -153,7 +159,7 @@ fun Button(
                     }
                 }
                 "text-primary" -> {
-                    if (enabled!!){
+                    if (enabled){
                         ButtonDefaults.buttonColors(
                             containerColor = Color.Transparent,
                             contentColor = MaterialTheme.colors.primary,
@@ -172,7 +178,7 @@ fun Button(
             if (variant == "contained") {
                 BorderStroke(
                     2.dp,
-                    if (enabled!!)
+                    if (enabled)
                         color
                     else
                         MaterialTheme.colors.onBackground
