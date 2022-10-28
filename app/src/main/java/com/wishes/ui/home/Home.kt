@@ -239,8 +239,8 @@ fun HomeScreen(
                             Text(
                                 "Saldo atual",
                                 color = MaterialTheme.colors.secondary,
+                                style = MaterialTheme.typography.body1,
                                 fontWeight = FontWeight.SemiBold,
-                                fontSize = 16.sp,
                             )
                             Row(
                                 horizontalArrangement = Arrangement.Start,
@@ -249,14 +249,14 @@ fun HomeScreen(
                                 Text(
                                     "R$",
                                     color = MaterialTheme.colors.secondary,
+                                    style = MaterialTheme.typography.h6,
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 20.sp,
                                 )
                                 Text(
                                     formatDotToPeriod("${saldo ?: "0.00"}"),
                                     color = MaterialTheme.colors.secondary,
+                                    style = MaterialTheme.typography.h6,
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 20.sp,
                                     overflow = TextOverflow.Ellipsis,
                                     maxLines = 1,
                                     modifier =

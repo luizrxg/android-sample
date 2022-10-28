@@ -109,6 +109,7 @@ fun ReceiptScreen(
                             text = {
                                 Text(
                                     "Todos",
+                                    style = MaterialTheme.typography.body1,
                                     color =
                                     if (selectedItems == items){
                                         MaterialTheme.colors.secondaryVariant
@@ -126,6 +127,7 @@ fun ReceiptScreen(
                             text = {
                                 Text(
                                     "Ultimo Mês",
+                                    style = MaterialTheme.typography.body1,
                                     color =
                                     if (selectedItems == itemsMes){
                                         MaterialTheme.colors.secondaryVariant

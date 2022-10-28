@@ -46,7 +46,8 @@ fun TextField(
             if (placeholder != null)
                 Text(
                     placeholder,
-                    color = MaterialTheme.colors.secondary.copy(.2f)
+                    color = MaterialTheme.colors.secondary.copy(.2f),
+                    style = MaterialTheme.typography.body1
                 )
         },
         label = label,

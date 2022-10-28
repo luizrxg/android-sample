@@ -184,6 +184,7 @@ fun SimulationScreen(
                                 Text(
                                     formatDotToPeriod("Saldo"),
                                     color = MaterialTheme.colors.secondary,
+                                    style = MaterialTheme.typography.body1,
                                     fontSize = 16.sp,
                                     overflow = TextOverflow.Ellipsis,
                                     maxLines = 1,
@@ -193,6 +194,7 @@ fun SimulationScreen(
                                     formatDotToPeriod("R$ ${formatToFixed2(saldo ?: BigDecimal.ZERO)}"),
                                     color = MaterialTheme.colors.secondary,
                                     fontWeight = FontWeight.SemiBold,
+                                    style = MaterialTheme.typography.body1,
                                     fontSize = 18.sp,
                                     overflow = TextOverflow.Ellipsis,
                                     maxLines = 1,
@@ -215,7 +217,7 @@ fun SimulationScreen(
                                 Text(
                                     formatDotToPeriod("Total"),
                                     color = MaterialTheme.colors.secondary,
-                                    fontSize = 16.sp,
+                                    style = MaterialTheme.typography.body1,
                                     overflow = TextOverflow.Ellipsis,
                                     maxLines = 1,
                                     modifier = Modifier.padding()
@@ -223,6 +225,7 @@ fun SimulationScreen(
                                 Text(
                                     formatDotToPeriod("R$ ${formatToFixed2(total ?: BigDecimal.ZERO)}"),
                                     color = MaterialTheme.colors.secondary,
+                                    style = MaterialTheme.typography.body1,
                                     fontWeight = FontWeight.SemiBold,
                                     fontSize = 18.sp,
                                     overflow = TextOverflow.Ellipsis,
@@ -246,7 +249,7 @@ fun SimulationScreen(
                                 Text(
                                     formatDotToPeriod("Resto"),
                                     color = MaterialTheme.colors.secondary,
-                                    fontSize = 16.sp,
+                                    style = MaterialTheme.typography.body1,
                                     overflow = TextOverflow.Ellipsis,
                                     maxLines = 1,
                                     modifier = Modifier.padding()
@@ -258,6 +261,7 @@ fun SimulationScreen(
                                         MaterialTheme.colors.secondary
                                     else
                                         colorResource(R.color.red),
+                                    style = MaterialTheme.typography.body1,
                                     fontWeight = FontWeight.SemiBold,
                                     fontSize = 18.sp,
                                     overflow = TextOverflow.Ellipsis,
